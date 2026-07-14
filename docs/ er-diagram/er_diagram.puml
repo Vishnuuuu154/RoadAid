@@ -1,0 +1,190 @@
+@startuml
+
+hide circle
+skinparam linetype ortho
+
+entity users {
+    * id : BIGINT
+    --
+    full_name
+    email
+    phone
+    password
+    role
+    profile_image
+    is_active
+    created_at
+    updated_at
+}
+
+entity service_providers {
+    * id
+    --
+    user_id
+    experience_years
+    verification_status
+    average_rating
+    total_reviews
+    completed_jobs
+    online_status
+    bio
+    created_at
+    updated_at
+}
+
+entity workshops {
+    * id
+    --
+    provider_id
+    workshop_name
+    address
+    latitude
+    longitude
+    opening_time
+    closing_time
+}
+
+entity provider_services {
+    * id
+    --
+    provider_id
+    service_name
+}
+
+entity provider_capabilities {
+    * id
+    --
+    provider_id
+    vehicle_type
+    fuel_type
+}
+
+entity vehicles {
+    * id
+    --
+    user_id
+    vehicle_type
+    brand
+    model
+    registration_number
+    fuel_type
+}
+
+entity service_requests {
+    * id
+    --
+    user_id
+    provider_id
+    vehicle_id
+    service_type
+    request_type
+    problem_description
+    latitude
+    longitude
+    status
+    created_at
+    updated_at
+}
+
+entity quotations {
+    * id
+    --
+    request_id
+    labour_charge
+    parts_charge
+    travel_fee
+    platform_fee
+    total_amount
+    status
+    created_at
+}
+
+entity payments {
+    * id
+    --
+    quotation_id
+    amount
+    tip_amount
+    payment_method
+    payment_status
+    payment_date
+}
+
+entity reviews {
+    * id
+    --
+    request_id
+    customer_user_id
+    provider_id
+    rating
+    review
+    created_at
+}
+
+entity complaints {
+    * id
+    --
+    request_id
+    complainant_user_id
+    against_user_id
+    description
+    status
+    created_at
+}
+
+entity notifications {
+    * id
+    --
+    user_id
+    title
+    message
+    is_read
+    created_at
+}
+
+entity favorites {
+    * user_id
+    * provider_id
+}
+
+entity system_logs {
+    * id
+    --
+    user_id
+    action
+    timestamp
+}
+
+entity request_status_history {
+    * id
+    --
+    request_id
+    status
+    changed_at
+}
+
+users ||--o| service_providers
+
+users ||--o{ vehicles
+users ||--o{ notifications
+users ||--o{ complaints
+users ||--o{ system_logs
+users ||--o{ favorites
+
+service_providers ||--o| workshops
+service_providers ||--o{ provider_services
+service_providers ||--o{ provider_capabilities
+service_providers ||--o{ service_requests
+service_providers ||--o{ reviews
+service_providers ||--o{ favorites
+
+vehicles ||--o{ service_requests
+
+service_requests ||--|| quotations
+quotations ||--|| payments
+
+service_requests ||--|| reviews
+service_requests ||--o{ complaints
+service_requests ||--o{ request_status_history
+
+@enduml
