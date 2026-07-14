@@ -1,190 +1,194 @@
-@startuml
+@startuml RoadAid_ER_Diagram
 
 hide circle
 skinparam linetype ortho
+skinparam shadowing false
+skinparam packageStyle rectangle
 
-entity users {
-    * id : BIGINT
-    --
-    full_name
-    email
-    phone
-    password
-    role
-    profile_image
-    is_active
-    created_at
-    updated_at
+entity "users" as users {
+  * id : BIGINT
+  --
+  full_name : VARCHAR(100)
+  email : VARCHAR(100)
+  phone : VARCHAR(15)
+  password : VARCHAR(255)
+  role : VARCHAR(30)
+  profile_image : VARCHAR(255)
+  is_active : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
 }
 
-entity service_providers {
-    * id
-    --
-    user_id
-    experience_years
-    verification_status
-    average_rating
-    total_reviews
-    completed_jobs
-    online_status
-    bio
-    created_at
-    updated_at
+entity "service_providers" as sp {
+  * id : BIGINT
+  --
+  user_id : BIGINT <<FK>>
+  experience_years : INT
+  verification_status : VARCHAR(20)
+  average_rating : DECIMAL
+  total_reviews : INT
+  completed_jobs : INT
+  online_status : VARCHAR(20)
+  bio : TEXT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
 }
 
-entity workshops {
-    * id
-    --
-    provider_id
-    workshop_name
-    address
-    latitude
-    longitude
-    opening_time
-    closing_time
+entity "workshops" as workshops {
+  * id : BIGINT
+  --
+  provider_id : BIGINT <<FK>>
+  workshop_name : VARCHAR(100)
+  address : TEXT
+  latitude : DECIMAL
+  longitude : DECIMAL
+  opening_time : TIME
+  closing_time : TIME
 }
 
-entity provider_services {
-    * id
-    --
-    provider_id
-    service_name
+entity "provider_services" as ps {
+  * id : BIGINT
+  --
+  provider_id : BIGINT <<FK>>
+  service_name : VARCHAR(30)
 }
 
-entity provider_capabilities {
-    * id
-    --
-    provider_id
-    vehicle_type
-    fuel_type
+entity "provider_capabilities" as pc {
+  * id : BIGINT
+  --
+  provider_id : BIGINT <<FK>>
+  vehicle_type : VARCHAR(30)
+  fuel_type : VARCHAR(20)
 }
 
-entity vehicles {
-    * id
-    --
-    user_id
-    vehicle_type
-    brand
-    model
-    registration_number
-    fuel_type
+entity "vehicles" as vehicles {
+  * id : BIGINT
+  --
+  user_id : BIGINT <<FK>>
+  vehicle_type : VARCHAR(30)
+  brand : VARCHAR(50)
+  model : VARCHAR(50)
+  registration_number : VARCHAR(20)
+  fuel_type : VARCHAR(20)
+  created_at : TIMESTAMP
 }
 
-entity service_requests {
-    * id
-    --
-    user_id
-    provider_id
-    vehicle_id
-    service_type
-    request_type
-    problem_description
-    latitude
-    longitude
-    status
-    created_at
-    updated_at
+entity "service_requests" as sr {
+  * id : BIGINT
+  --
+  user_id : BIGINT <<FK>>
+  provider_id : BIGINT <<FK>>
+  vehicle_id : BIGINT <<FK>>
+  service_type : VARCHAR(30)
+  request_type : VARCHAR(30)
+  problem_description : TEXT
+  latitude : DECIMAL
+  longitude : DECIMAL
+  status : VARCHAR(30)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
 }
 
-entity quotations {
-    * id
-    --
-    request_id
-    labour_charge
-    parts_charge
-    travel_fee
-    platform_fee
-    total_amount
-    status
-    created_at
+entity "quotations" as quotations {
+  * id : BIGINT
+  --
+  request_id : BIGINT <<FK>>
+  labour_charge : DECIMAL
+  parts_charge : DECIMAL
+  travel_fee : DECIMAL
+  platform_fee : DECIMAL
+  total_amount : DECIMAL
+  status : VARCHAR(20)
+  created_at : TIMESTAMP
 }
 
-entity payments {
-    * id
-    --
-    quotation_id
-    amount
-    tip_amount
-    payment_method
-    payment_status
-    payment_date
+entity "payments" as payments {
+  * id : BIGINT
+  --
+  quotation_id : BIGINT <<FK>>
+  amount : DECIMAL
+  tip_amount : DECIMAL
+  payment_method : VARCHAR(30)
+  payment_status : VARCHAR(30)
+  payment_date : TIMESTAMP
 }
 
-entity reviews {
-    * id
-    --
-    request_id
-    customer_user_id
-    provider_id
-    rating
-    review
-    created_at
+entity "reviews" as reviews {
+  * id : BIGINT
+  --
+  request_id : BIGINT <<FK>>
+  user_id : BIGINT <<FK>>
+  provider_id : BIGINT <<FK>>
+  rating : INT
+  review : TEXT
+  created_at : TIMESTAMP
 }
 
-entity complaints {
-    * id
-    --
-    request_id
-    complainant_user_id
-    against_user_id
-    description
-    status
-    created_at
+entity "complaints" as complaints {
+  * id : BIGINT
+  --
+  request_id : BIGINT <<FK>>
+  user_id : BIGINT <<FK>>
+  complaint_type : VARCHAR(50)
+  description : TEXT
+  status : VARCHAR(20)
+  created_at : TIMESTAMP
 }
 
-entity notifications {
-    * id
-    --
-    user_id
-    title
-    message
-    is_read
-    created_at
+entity "notifications" as notifications {
+  * id : BIGINT
+  --
+  user_id : BIGINT <<FK>>
+  title : VARCHAR(100)
+  message : TEXT
+  is_read : BOOLEAN
+  created_at : TIMESTAMP
 }
 
-entity favorites {
-    * user_id
-    * provider_id
+entity "favorites" as favorites {
+  * user_id : BIGINT <<FK>>
+  * provider_id : BIGINT <<FK>>
 }
 
-entity system_logs {
-    * id
-    --
-    user_id
-    action
-    timestamp
+entity "system_logs" as logs {
+  * id : BIGINT
+  --
+  user_id : BIGINT <<FK>>
+  action : VARCHAR(255)
+  timestamp : TIMESTAMP
 }
 
-entity request_status_history {
-    * id
-    --
-    request_id
-    status
-    changed_at
+entity "request_status_history" as history {
+  * id : BIGINT
+  --
+  request_id : BIGINT <<FK>>
+  status : VARCHAR(30)
+  changed_at : TIMESTAMP
 }
 
-users ||--o| service_providers
+users ||--o| sp : "is"
+users ||--o{ vehicles : owns
+users ||--o{ sr : creates
+users ||--o{ notifications : receives
+users ||--o{ complaints : submits
+users ||--o{ reviews : writes
+users ||--o{ logs : generates
+users ||--o{ favorites : bookmarks
 
-users ||--o{ vehicles
-users ||--o{ notifications
-users ||--o{ complaints
-users ||--o{ system_logs
-users ||--o{ favorites
+sp ||--o| workshops : owns
+sp ||--o{ ps : offers
+sp ||--o{ pc : supports
+sp ||--o{ sr : accepts
+sp ||--o{ reviews : receives
+sp ||--o{ favorites : bookmarked
 
-service_providers ||--o| workshops
-service_providers ||--o{ provider_services
-service_providers ||--o{ provider_capabilities
-service_providers ||--o{ service_requests
-service_providers ||--o{ reviews
-service_providers ||--o{ favorites
+vehicles ||--o{ sr : used_in
 
-vehicles ||--o{ service_requests
+sr ||--|| quotations : has
+quotations ||--|| payments : paid_by
 
-service_requests ||--|| quotations
-quotations ||--|| payments
-
-service_requests ||--|| reviews
-service_requests ||--o{ complaints
-service_requests ||--o{ request_status_history
+sr ||--|| reviews : receives
+sr ||--o{ complaints : related_to
+sr ||--o{ history : status_updates
 
 @enduml
