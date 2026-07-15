@@ -114,6 +114,29 @@ CREATE TABLE provider_services (
                                        UNIQUE (provider_id, service_name)
 );
 -- ===========================================
+-- Table: provider_capabilities
+-- ===========================================
+
+CREATE TABLE provider_capabilities (
+                                       id INT AUTO_INCREMENT PRIMARY KEY,
+
+                                       provider_id INT NOT NULL,
+
+                                       vehicle_type VARCHAR(30) NOT NULL,
+
+                                       fuel_type VARCHAR(20) NOT NULL,
+
+                                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                                       CONSTRAINT fk_provider_capabilities_provider
+                                           FOREIGN KEY (provider_id)
+                                               REFERENCES service_providers(id)
+                                               ON DELETE CASCADE,
+
+                                       CONSTRAINT uk_provider_capability
+                                           UNIQUE (provider_id, vehicle_type, fuel_type)
+);
+-- ===========================================
 -- Table: vehicles
 -- ===========================================
 
