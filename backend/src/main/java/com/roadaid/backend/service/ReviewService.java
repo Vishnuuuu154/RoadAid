@@ -1,0 +1,78 @@
+package com.roadaid.backend.service;
+
+import com.roadaid.backend.entity.*;
+import com.roadaid.backend.repository.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import com.roadaid.backend.entity.Mechanic;
+import com.roadaid.backend.repository.MechanicRepository;
+
+import java.time.LocalDateTime;
+
+@Service
+public class ReviewService {
+
+    private final ReviewRepository reviewRepository;
+    private final ServiceRequestRepository serviceRequestRepository;
+    private final UserRepository userRepository;
+    private final MechanicRepository mechanicRepository;
+
+    public ReviewService(
+            ReviewRepository reviewRepository,
+            ServiceRequestRepository serviceRequestRepository,
+            UserRepository userRepository,
+            MechanicRepository mechanicRepository
+    ) {
+        this.reviewRepository = reviewRepository;
+        this.serviceRequestRepository = serviceRequestRepository;
+        this.userRepository = userRepository;
+        this.mechanicRepository = mechanicRepository;
+    }
+
+    public Review addReview(Long requestId, Review review) {
+
+        ServiceRequest serviceRequest = serviceRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Service request not found"));
+
+        if (!serviceRequest.getStatus().equals("COMPLETED")) {
+            throw new RuntimeException("Review can only be added after service completion");
+        }
+
+        if (reviewRepository.findByServiceRequest(serviceRequest).isPresent()) {
+            throw new RuntimeException("Review already submitted");
+        }
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User customer = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        review.setCustomer(customer);
+        review.setMechanic(serviceRequest.getMechanic());
+        review.setServiceRequest(serviceRequest);
+        review.setCreatedAt(LocalDateTime.now());
+
+        return reviewRepository.save(review);
+    }
+    public List<Review> getReviewsByMechanic(Long mechanicId) {
+
+        Mechanic mechanic = mechanicRepository.findById(mechanicId)
+                .orElseThrow(() -> new RuntimeException("Mechanic not found"));
+
+        return reviewRepository.findByMechanic(mechanic);
+    }
+    public Double getAverageRating(Long mechanicId) {
+
+        Mechanic mechanic = mechanicRepository.findById(mechanicId)
+                .orElseThrow(() -> new RuntimeException("Mechanic not found"));
+
+        Double average = reviewRepository.findAverageRatingByMechanic(mechanic);
+
+        return average != null ? average : 0.0;
+    }
+}

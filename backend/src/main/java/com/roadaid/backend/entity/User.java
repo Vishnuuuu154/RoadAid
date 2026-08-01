@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,7 +31,7 @@ public class User {
 
     @Column(unique = true, nullable = false)
     private String phone;
-
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 

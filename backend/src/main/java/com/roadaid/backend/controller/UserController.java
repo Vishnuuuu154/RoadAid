@@ -1,13 +1,17 @@
 package com.roadaid.backend.controller;
-
+import com.roadaid.backend.dto.LoginResponse;
+import com.roadaid.backend.dto.LoginRequest;
 import com.roadaid.backend.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.roadaid.backend.dto.RegisterRequest;
+
 import com.roadaid.backend.entity.User;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.web.bind.annotation.GetMapping;
+import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -18,9 +22,17 @@ public class UserController {
         this.userService = userService;
     }
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest request) {
+    public String registerUser(@Valid @RequestBody RegisterRequest request) {
         userService.registerUser(request);
         return "User registered successfully!";
+    }
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody LoginRequest request) {
+        return userService.loginUser(request);
+    }
+    @GetMapping("/profile")
+    public String profile() {
+        return "Welcome to your profile!";
     }
 
 }
