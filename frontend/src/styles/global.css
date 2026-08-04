@@ -1,0 +1,25 @@
+body{
+    background:#f4f7fb;
+    font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;
+}
+
+a{
+    text-decoration:none;
+}
+
+button{
+    border-radius:8px !important;
+}
+
+.form-control{
+    border-radius:8px;
+}
+
+.card{
+    border:none;
+    border-radius:15px;
+}
+
+.shadow-lg{
+    box-shadow:0 10px 30px rgba(0,0,0,.08)!important;
+}
