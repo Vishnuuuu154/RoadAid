@@ -49,7 +49,9 @@ function Users() {
 
             console.error(error);
 
-            alert("Failed to deactivate user.");
+            alert(
+                error.response?.data?.message || "Failed to deactivate user."
+            );
 
         }
 
@@ -97,6 +99,15 @@ function Users() {
                     placeholder="Search by name or email..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => {
+
+                        if (e.key === "Enter") {
+
+                            handleSearch();
+
+                        }
+
+                    }}
                 />
 
                 <button
@@ -110,11 +121,25 @@ function Users() {
 
             {loading ? (
 
-                <h5>Loading users...</h5>
+                <div className="text-center">
+
+                    <div
+                        className="spinner-border text-primary"
+                        role="status"
+                    >
+                    </div>
+
+                    <p className="mt-2">
+
+                        Loading users...
+
+                    </p>
+
+                </div>
 
             ) : (
 
-                <table className="table table-bordered table-hover">
+                <table className="table table-hover align-middle shadow-sm">
 
                     <thead className="table-dark">
 
@@ -154,14 +179,25 @@ function Users() {
                                 <td>{user.fullName}</td>
                                 <td>{user.email}</td>
                                 <td>{user.role}</td>
-                                <td>{user.isActive ? "Active" : "Inactive"}</td>
+                                <td>
+                                    {user.isActive ? (
+                                        <span className="badge bg-success">
+            Active
+        </span>
+                                    ) : (
+                                        <span className="badge bg-danger">
+            Inactive
+        </span>
+                                    )}
+                                </td>
 
                                 <td>
 
                                     {user.isActive ? (
 
                                         <button
-                                            className="btn btn-danger btn-sm"
+                                            className="btn btn-outline-danger btn-sm"
+                                            className="btn btn-outline-success btn-sm"
                                             onClick={() => handleDeactivate(user.id)}
                                         >
                                             Deactivate
