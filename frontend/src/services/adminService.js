@@ -15,3 +15,16 @@ export const activateUser = (id) => {
 export const deactivateUser = (id) => {
     return api.put(`/admin/users/${id}/deactivate`);
 };
+export const getRequests = (status = "", customer = "") => {
+
+    return api.get("/admin/requests", {
+        params: {
+            status,
+            customer
+        }
+    });
+
+};
+export const getComplaints = () => {
+    return api.get("/admin/complaints");
+};

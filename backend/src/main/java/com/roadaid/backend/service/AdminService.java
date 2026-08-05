@@ -1,6 +1,7 @@
 package com.roadaid.backend.service;
 
 import com.roadaid.backend.dto.AdminDashboardResponse;
+import com.roadaid.backend.dto.ComplaintSummaryResponse;
 import com.roadaid.backend.entity.ServiceRequest;
 import com.roadaid.backend.entity.User;
 import com.roadaid.backend.repository.ComplaintRepository;
@@ -14,7 +15,7 @@ import com.roadaid.backend.dto.AdminRequestSummaryResponse;
 import com.roadaid.backend.entity.ServiceRequest;
 import java.util.List;
 
-
+import com.roadaid.backend.entity.Complaint;
 import java.util.List;
 
 @Service
@@ -192,6 +193,42 @@ public class AdminService {
 
         }).toList();
     }
+    public List<ComplaintSummaryResponse> getAllComplaints() {
+
+        List<Complaint> complaints = complaintRepository.findAll();
+
+        return complaints.stream().map(complaint -> {
+
+            ComplaintSummaryResponse response = new ComplaintSummaryResponse();
+
+            response.setComplaintId(complaint.getId());
+
+            response.setServiceRequestId(
+                    complaint.getServiceRequest().getId()
+            );
+
+            response.setReportedBy(
+                    complaint.getReportedBy().getFullName()
+            );
+
+            response.setReportedAgainst(
+                    complaint.getReportedAgainst().getFullName()
+            );
+
+            response.setReason(complaint.getReason());
+
+            response.setDescription(complaint.getDescription());
+
+            response.setStatus(complaint.getStatus());
+
+            response.setCreatedAt(complaint.getCreatedAt());
+
+            return response;
+
+        }).toList();
+
+    }
+
 
 
 }

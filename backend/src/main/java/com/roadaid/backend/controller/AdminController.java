@@ -1,7 +1,9 @@
 package com.roadaid.backend.controller;
 
 import com.roadaid.backend.dto.AdminDashboardResponse;
+import com.roadaid.backend.dto.AdminMechanicResponse;
 import com.roadaid.backend.dto.AdminRequestSummaryResponse;
+import com.roadaid.backend.dto.ComplaintSummaryResponse;
 import com.roadaid.backend.entity.ServiceRequest;
 import com.roadaid.backend.entity.User;
 import com.roadaid.backend.service.AdminService;
@@ -43,4 +45,10 @@ public class AdminController {
     ) {
         return adminService.getAllRequests(status, customer);
     }
+    @GetMapping("/complaints")
+    public List<ComplaintSummaryResponse> getAllComplaints() {
+        return adminService.getAllComplaints();
+    }
+
+
 }
