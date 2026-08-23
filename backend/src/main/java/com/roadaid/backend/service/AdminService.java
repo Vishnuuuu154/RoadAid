@@ -1,21 +1,14 @@
 package com.roadaid.backend.service;
 
-import com.roadaid.backend.dto.AdminDashboardResponse;
-import com.roadaid.backend.dto.ComplaintSummaryResponse;
-import com.roadaid.backend.entity.ServiceRequest;
-import com.roadaid.backend.entity.User;
-import com.roadaid.backend.repository.ComplaintRepository;
-import com.roadaid.backend.repository.PaymentRepository;
-import com.roadaid.backend.repository.ServiceRequestRepository;
-import com.roadaid.backend.repository.UserRepository;
+import com.roadaid.backend.dto.*;
+import com.roadaid.backend.entity.*;
+import com.roadaid.backend.repository.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
-import com.roadaid.backend.dto.AdminRequestSummaryResponse;
-import com.roadaid.backend.entity.ServiceRequest;
+import com.roadaid.backend.dto.AdminRequestDetailsResponse;
 import java.util.List;
 
-import com.roadaid.backend.entity.Complaint;
 import java.util.List;
 
 @Service
@@ -25,17 +18,20 @@ public class AdminService {
     private final ServiceRequestRepository serviceRequestRepository;
     private final ComplaintRepository complaintRepository;
     private final PaymentRepository paymentRepository;
+    private final MechanicRepository mechanicRepository;
 
     public AdminService(
             UserRepository userRepository,
             ServiceRequestRepository serviceRequestRepository,
             ComplaintRepository complaintRepository,
-            PaymentRepository paymentRepository
+            PaymentRepository paymentRepository,
+             MechanicRepository mechanicRepository
     ) {
         this.userRepository = userRepository;
         this.serviceRequestRepository = serviceRequestRepository;
         this.complaintRepository = complaintRepository;
         this.paymentRepository = paymentRepository;
+        this.mechanicRepository= mechanicRepository;
     }
     public AdminDashboardResponse getDashboard() {
 
@@ -228,7 +224,127 @@ public class AdminService {
         }).toList();
 
     }
+    public List<AdminMechanicResponse> getAllMechanics(String search) {
 
+        List<Mechanic> mechanics = mechanicRepository.findAll();
+
+        if (search != null && !search.isBlank()) {
+
+            String keyword = search.toLowerCase();
+
+            mechanics = mechanics.stream()
+                    .filter(m ->
+                            m.getUser().getFullName().toLowerCase().contains(keyword) ||
+                                    m.getWorkshopName().toLowerCase().contains(keyword)
+                    )
+                    .toList();
+
+        }
+
+        return mechanics.stream().map(mechanic -> {
+
+            AdminMechanicResponse response = new AdminMechanicResponse();
+
+            response.setMechanicId(mechanic.getId());
+            response.setFullName(mechanic.getUser().getFullName());
+            response.setWorkshopName(mechanic.getWorkshopName());
+            response.setContactNumber(mechanic.getContactNumber());
+            response.setExperienceYears(mechanic.getExperienceYears());
+            response.setAvailable(mechanic.getAvailable());
+
+            return response;
+
+        }).toList();
+
+    }
+    public AdminAnalyticsResponse getAnalytics() {
+
+        AdminAnalyticsResponse response = new AdminAnalyticsResponse();
+
+        response.setTotalCustomers(
+                userRepository.countByRole("CUSTOMER")
+        );
+
+        response.setTotalMechanics(
+                userRepository.countByRole("MECHANIC")
+        );
+
+        response.setTotalRequests(
+                serviceRequestRepository.count()
+        );
+
+        response.setPendingRequests(
+                serviceRequestRepository.countByStatus("PENDING")
+        );
+
+        response.setCompletedRequests(
+                serviceRequestRepository.countByStatus("COMPLETED")
+        );
+
+        response.setCancelledRequests(
+                serviceRequestRepository.countByStatus("CANCELLED")
+        );
+
+        response.setTotalComplaints(
+                complaintRepository.count()
+        );
+
+        response.setTotalPayments(
+                paymentRepository.count()
+        );
+
+        return response;
+
+    }
+    public AdminRequestDetailsResponse getRequestById(Long requestId) {
+
+        ServiceRequest request = serviceRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        AdminRequestDetailsResponse response = new AdminRequestDetailsResponse();
+
+        response.setRequestId(request.getId());
+
+        response.setCustomerName(
+                request.getCustomer().getFullName()
+        );
+
+        if (request.getMechanic() != null) {
+
+            response.setMechanicName(
+                    request.getMechanic().getUser().getFullName()
+            );
+
+        } else {
+
+            response.setMechanicName("Not Assigned");
+
+        }
+
+        response.setVehicle(
+                request.getVehicle().getBrand() + " " +
+                        request.getVehicle().getModel()
+        );
+
+        response.setIssue(
+                request.getIssueDescription()
+        );
+
+        response.setLocation(
+                request.getLocation()
+        );
+
+        response.setStatus(
+                request.getStatus()
+        );
+
+        response.setCreatedAt(
+                request.getCreatedAt()
+        );
+
+        return response;
+
+    }
 
 
 }

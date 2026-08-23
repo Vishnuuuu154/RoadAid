@@ -31,12 +31,15 @@ public class ServiceRequestController {
     public ServiceRequest createRequest(
             @RequestPart("request") ServiceRequest serviceRequest,
             @RequestParam Long vehicleId,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images
+            @RequestParam Long mechanicId,
+            @RequestPart(value = "images", required = false)
+            List<MultipartFile> images
     ) throws IOException {
 
         return serviceRequestService.createRequest(
                 serviceRequest,
                 vehicleId,
+                mechanicId,
                 images
         );
     }
@@ -72,6 +75,23 @@ public class ServiceRequestController {
     @PutMapping("/{requestId}/reject")
     public ServiceRequest rejectRequest(@PathVariable Long requestId) {
         return serviceRequestService.rejectRequest(requestId);
+
+    }
+    @PutMapping("/{requestId}/reassign/{mechanicId}")
+    public ServiceRequest reassignMechanic(
+            @PathVariable Long requestId,
+            @PathVariable Long mechanicId
+    ) {
+        return serviceRequestService.reassignMechanic(
+                requestId,
+                mechanicId
+        );
+    }
+    @PutMapping("/{requestId}/auto-reassign")
+    public ServiceRequest autoReassignMechanic(
+            @PathVariable Long requestId
+    ) {
+        return serviceRequestService.autoReassignMechanic(requestId);
     }
     @GetMapping("/{requestId}")
     public ServiceRequest trackRequest(@PathVariable Long requestId) {
@@ -96,5 +116,11 @@ public class ServiceRequestController {
     @GetMapping("/my")
     public List<CustomerRequestSummaryResponse> getMyRequests() {
         return serviceRequestService.getMyRequests();
+    }
+    @GetMapping("/{requestId}/mechanic-details")
+    public RequestDetailsResponse getMechanicRequestDetails(
+            @PathVariable Long requestId
+    ) {
+        return serviceRequestService.getMechanicRequestDetails(requestId);
     }
 }

@@ -1,11 +1,14 @@
 package com.roadaid.backend.service;
 
+import com.roadaid.backend.dto.MechanicRequestSummaryResponse;
 import com.roadaid.backend.entity.Mechanic;
+import com.roadaid.backend.entity.ServiceRequest;
 import com.roadaid.backend.entity.User;
 import com.roadaid.backend.exception.MechanicAlreadyExistsException;
 import com.roadaid.backend.exception.MechanicProfileNotFoundException;
 import com.roadaid.backend.exception.UserNotFoundException;
 import com.roadaid.backend.repository.MechanicRepository;
+import com.roadaid.backend.repository.ServiceRequestRepository;
 import com.roadaid.backend.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,11 +21,16 @@ public class MechanicService {
 
     private final MechanicRepository mechanicRepository;
     private final UserRepository userRepository;
+    private final ServiceRequestRepository serviceRequestRepository;
 
-    public MechanicService(MechanicRepository mechanicRepository,
-                           UserRepository userRepository) {
+    public MechanicService(
+            MechanicRepository mechanicRepository,
+            UserRepository userRepository,
+            ServiceRequestRepository serviceRequestRepository
+    ) {
         this.mechanicRepository = mechanicRepository;
         this.userRepository = userRepository;
+        this.serviceRequestRepository = serviceRequestRepository;
     }
 
     public Mechanic registerMechanic(Mechanic mechanic) {
@@ -86,5 +94,49 @@ public class MechanicService {
         mechanic.setAvailable(available);
 
         return mechanicRepository.save(mechanic);
+    }
+    public List<MechanicRequestSummaryResponse> getMyRequests() {
+
+        Mechanic mechanic = getMyProfile();
+
+        List<ServiceRequest> requests =
+                serviceRequestRepository
+                        .findByMechanicOrderByCreatedAtDesc(mechanic);
+
+        return requests.stream().map(request -> {
+
+            MechanicRequestSummaryResponse response =
+                    new MechanicRequestSummaryResponse();
+
+            response.setRequestId(request.getId());
+
+            response.setCustomerName(
+                    request.getCustomer().getFullName()
+            );
+
+            response.setVehicle(
+                    request.getVehicle().getBrand() + " " +
+                            request.getVehicle().getModel()
+            );
+
+            response.setIssue(
+                    request.getIssueDescription()
+            );
+
+            response.setLocation(
+                    request.getLocation()
+            );
+
+            response.setStatus(
+                    request.getStatus()
+            );
+
+            response.setCreatedAt(
+                    request.getCreatedAt()
+            );
+
+            return response;
+
+        }).toList();
     }
     }

@@ -10,7 +10,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     List<Favorite> findByCustomer(User customer);
     boolean existsByCustomerAndMechanic(User customer, Mechanic mechanic);
     void deleteByCustomerAndMechanic(User customer, Mechanic mechanic);
-
+    void deleteByCustomer(User customer);
 
 
 

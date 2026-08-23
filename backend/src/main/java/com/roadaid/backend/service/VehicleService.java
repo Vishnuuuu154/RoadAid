@@ -18,15 +18,37 @@ public class VehicleService {
         this.vehicleRepository = vehicleRepository;
         this.userRepository = userRepository;
     }
+
     public Vehicle saveVehicle(Vehicle vehicle) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
 
         vehicle.setUser(user);
+
+        String registrationNumber =
+                vehicle.getRegistrationNumber()
+                        .trim()
+                        .toUpperCase()
+                        .replaceAll("\\s+", " ");
+
+        vehicle.setRegistrationNumber(registrationNumber);
+
+        if (vehicleRepository.existsByRegistrationNumber(
+                registrationNumber)) {
+
+            throw new RuntimeException(
+                    "A vehicle with registration number " +
+                            registrationNumber +
+                            " is already registered."
+            );
+        }
 
         return vehicleRepository.save(vehicle);
     }
@@ -65,7 +87,24 @@ public class VehicleService {
         Vehicle vehicle = vehicleRepository.findByIdAndUser(vehicleId, user)
                 .orElseThrow(() -> new RuntimeException("Vehicle not found or access denied"));
 
-        vehicle.setRegistrationNumber(updatedVehicle.getRegistrationNumber());
+        String registrationNumber =
+                updatedVehicle.getRegistrationNumber()
+                        .trim()
+                        .toUpperCase()
+                        .replaceAll("\\s+", " ");
+
+        if (vehicleRepository.existsByRegistrationNumberAndIdNot(
+                registrationNumber,
+                vehicleId
+        )) {
+            throw new RuntimeException(
+                    "A vehicle with registration number " +
+                            registrationNumber +
+                            " is already registered."
+            );
+        }
+
+        vehicle.setRegistrationNumber(registrationNumber);
         vehicle.setVehicleType(updatedVehicle.getVehicleType());
         vehicle.setBrand(updatedVehicle.getBrand());
         vehicle.setModel(updatedVehicle.getModel());

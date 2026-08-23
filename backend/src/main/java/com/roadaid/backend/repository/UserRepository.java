@@ -22,4 +22,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             String fullName,
             String email
     );
+    Optional<User> findByPhone(String phone);
 }

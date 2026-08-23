@@ -1,16 +1,12 @@
 package com.roadaid.backend.controller;
-
-import com.roadaid.backend.dto.AdminDashboardResponse;
-import com.roadaid.backend.dto.AdminMechanicResponse;
-import com.roadaid.backend.dto.AdminRequestSummaryResponse;
-import com.roadaid.backend.dto.ComplaintSummaryResponse;
+import com.roadaid.backend.dto.*;
 import com.roadaid.backend.entity.ServiceRequest;
 import com.roadaid.backend.entity.User;
 import com.roadaid.backend.service.AdminService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+import com.roadaid.backend.dto.AdminRequestDetailsResponse;
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
@@ -49,6 +45,22 @@ public class AdminController {
     public List<ComplaintSummaryResponse> getAllComplaints() {
         return adminService.getAllComplaints();
     }
+    @GetMapping("/mechanics")
+    public List<AdminMechanicResponse> getAllMechanics(
+            @RequestParam(required = false) String search
+    ) {
+        return adminService.getAllMechanics(search);
+    }
+    @GetMapping("/analytics")
+    public AdminAnalyticsResponse getAnalytics() {
+        return adminService.getAnalytics();
+    }
 
-
+    @GetMapping("/requests/{requestId}")
+    public AdminRequestDetailsResponse getRequestById(
+            @PathVariable Long requestId
+    ) {
+        System.out.println(">>> Controller reached. Request ID = " + requestId);
+        return adminService.getRequestById(requestId);
+    }
 }

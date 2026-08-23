@@ -1,5 +1,5 @@
 package com.roadaid.backend.repository;
-
+import java.util.List;
 import com.roadaid.backend.entity.ServiceRequest;
 import com.roadaid.backend.entity.User;
 import com.roadaid.backend.entity.Mechanic;
@@ -8,6 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import com.roadaid.backend.entity.Mechanic;
+import com.roadaid.backend.entity.ServiceRequest;
+
+import java.util.List;
 
 @Repository
 public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, Long> {
@@ -23,8 +27,13 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
     List<ServiceRequest> findByCustomerAndStatusNot(User customer, String status);
     Optional<ServiceRequest> findByIdAndCustomer(Long id, User customer);
     List<ServiceRequest> findAllByOrderByCreatedAtDesc();
+
     List<ServiceRequest> findByStatusOrderByCreatedAtDesc(String status);
     List<ServiceRequest> findByCustomer_FullNameContainingIgnoreCaseOrderByCreatedAtDesc(
             String customerName
+    );
+    boolean existsByCustomerAndStatusIn(
+            User customer,
+            List<String> statuses
     );
 }

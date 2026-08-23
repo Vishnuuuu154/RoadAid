@@ -22,6 +22,11 @@ public class ReviewController {
 
         return reviewService.addReview(requestId, review);
     }
+    @GetMapping("/my")
+    public List<Review> getMyReviews() {
+
+        return reviewService.getMyReviews();
+    }
     @GetMapping("/mechanic/{mechanicId}")
     public List<Review> getReviewsByMechanic(
             @PathVariable Long mechanicId) {

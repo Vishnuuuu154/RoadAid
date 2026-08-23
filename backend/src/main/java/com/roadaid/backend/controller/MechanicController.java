@@ -1,5 +1,6 @@
 package com.roadaid.backend.controller;
 
+import com.roadaid.backend.dto.MechanicRequestSummaryResponse;
 import com.roadaid.backend.service.MechanicService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,5 +45,9 @@ public class MechanicController {
         Mechanic mechanic = mechanicService.updateAvailability(request.get("available"));
 
         return ResponseEntity.ok(mechanic);
+    }
+    @GetMapping("/requests")
+    public List<MechanicRequestSummaryResponse> getMyRequests() {
+        return mechanicService.getMyRequests();
     }
 }

@@ -12,5 +12,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     Optional<Payment> findByQuotation(Quotation quotation);
     List<Payment> findByQuotation_ServiceRequest_Customer(User customer);
-
+    Optional<Payment> findByQuotation_ServiceRequest_Id(Long requestId);
 }

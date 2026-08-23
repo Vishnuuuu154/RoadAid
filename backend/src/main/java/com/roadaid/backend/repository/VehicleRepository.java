@@ -11,5 +11,10 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     List<Vehicle> findByUser(User user);
     boolean existsByIdAndUser(Long id, User user);
     Optional<Vehicle> findByIdAndUser(Long id, User user);
-
+    boolean existsByRegistrationNumber(String registrationNumber);
+    boolean existsByRegistrationNumberAndIdNot(
+            String registrationNumber,
+            Long id
+    );
+    void deleteByUser(User user);
 }

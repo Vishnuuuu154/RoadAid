@@ -3,15 +3,14 @@ import com.roadaid.backend.dto.LoginResponse;
 import com.roadaid.backend.dto.LoginRequest;
 import com.roadaid.backend.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.roadaid.backend.dto.RegisterRequest;
 
 import com.roadaid.backend.entity.User;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
 import jakarta.validation.Valid;
+
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -30,9 +29,44 @@ public class UserController {
     public LoginResponse login(@RequestBody LoginRequest request) {
         return userService.loginUser(request);
     }
+
+
     @GetMapping("/profile")
-    public String profile() {
-        return "Welcome to your profile!";
+    public User getProfile() {
+        return userService.getCurrentUser();
+    }
+    @PutMapping("/profile")
+    public User updateProfile(
+            @RequestBody Map<String, String> request
+    ) {
+
+        return userService.updateProfile(
+                request.get("fullName"),
+                request.get("phone")
+        );
     }
 
+    @PutMapping("/change-password")
+    public String changePassword(
+            @RequestBody Map<String, String> request
+    ) {
+
+        userService.changePassword(
+                request.get("currentPassword"),
+                request.get("newPassword")
+        );
+
+        return "Password changed successfully";
+    }
+    @PutMapping("/delete-account")
+    public String deleteAccount(
+            @RequestBody Map<String, String> request
+    ) {
+
+        userService.deleteAccount(
+                request.get("password")
+        );
+
+        return "Account deleted successfully";
+    }
 }

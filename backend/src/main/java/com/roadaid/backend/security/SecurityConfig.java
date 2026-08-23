@@ -32,6 +32,8 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**")
+                        .permitAll()
                         .requestMatchers(
                                 "/api/users/register",
                                 "/api/users/login"
@@ -52,6 +54,8 @@ public class SecurityConfig {
                         .hasAnyRole("CUSTOMER", "MECHANIC")
 
                         .requestMatchers("/api/mechanics/me")
+                        .hasRole("MECHANIC")
+                        .requestMatchers("/api/mechanics/requests")
                         .hasRole("MECHANIC")
 
                         .requestMatchers(HttpMethod.POST, "/api/mechanics")
@@ -100,7 +104,7 @@ public class SecurityConfig {
         );
 
         configuration.setAllowedMethods(
-                List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                List.of("GET", "POST", "PUT","PATCH", "DELETE", "OPTIONS")
         );
 
         configuration.setAllowedHeaders(

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ServiceRequest {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,6 +25,9 @@ public class ServiceRequest {
     @ManyToOne
     @JoinColumn(name = "mechanic_id")
     private Mechanic mechanic;
+    @ManyToOne
+    @JoinColumn(name = "rejected_by_mechanic_id")
+    private Mechanic rejectedByMechanic;
     @Column(nullable = false)
     private String issueDescription;
     @Column(nullable = false)
@@ -32,6 +36,7 @@ public class ServiceRequest {
     private String status = "PENDING";
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
 
 
 

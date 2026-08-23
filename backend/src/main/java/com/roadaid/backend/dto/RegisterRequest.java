@@ -23,10 +23,25 @@ public class RegisterRequest {
     )
     private String phone;
 
-    @Size(min = 8, message = "Password must contain at least 8 characters")
+    @Size(
+            min = 8,
+            message = "Password must contain at least 8 characters"
+    )
     @NotBlank(message = "Password is required")
     private String password;
 
     @NotBlank(message = "Role is required")
     private String role;
+
+
+    // Mechanic-specific fields
+
+    private String workshopName;
+
+    private String workshopAddress;
+
+    private Integer experienceYears;
+
+    private String contactNumber;
+
 }

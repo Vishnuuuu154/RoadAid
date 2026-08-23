@@ -2,6 +2,7 @@ package com.roadaid.backend.controller;
 
 import com.roadaid.backend.entity.Vehicle;
 import com.roadaid.backend.service.VehicleService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +21,7 @@ public class VehicleController {
     }
 
     @PostMapping
-    public Vehicle addVehicle(@RequestBody Vehicle vehicle) {
+    public Vehicle addVehicle(@Valid @RequestBody Vehicle vehicle) {
         return vehicleService.saveVehicle(vehicle);
     }
 
@@ -35,7 +36,7 @@ public class VehicleController {
     }
     @PutMapping("/{id}")
     public Vehicle updateVehicle(@PathVariable Long id,
-                                 @RequestBody Vehicle vehicle) {
+                                 @Valid @RequestBody Vehicle vehicle) {
         return vehicleService.updateVehicle(id, vehicle);
     }
 }

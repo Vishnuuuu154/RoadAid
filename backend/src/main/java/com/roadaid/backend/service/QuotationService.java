@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class QuotationService {
 
@@ -114,6 +116,118 @@ public class QuotationService {
         serviceRequestRepository.save(serviceRequest);
 
         System.out.println("Before Save: " + serviceRequest.getStatus());
+
+        return quotationRepository.save(quotation);
+    }
+    public List<Quotation> getMyQuotations() {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        Mechanic mechanic =
+                mechanicRepository.findByUser(user)
+                        .orElseThrow(() ->
+                                new RuntimeException("Mechanic profile not found"));
+
+        return quotationRepository
+                .findByServiceRequest_MechanicOrderByIdDesc(mechanic);
+    }
+    public Quotation updateQuotation(
+            Long requestId,
+            Quotation updatedQuotation
+    ) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        Mechanic mechanic = mechanicRepository.findByUser(user)
+                .orElseThrow(() ->
+                        new RuntimeException("Mechanic profile not found"));
+
+        ServiceRequest serviceRequest =
+                serviceRequestRepository.findById(requestId)
+                        .orElseThrow(() ->
+                                new RuntimeException("Service request not found"));
+
+        if (serviceRequest.getMechanic() == null ||
+                !serviceRequest.getMechanic().getId().equals(mechanic.getId())) {
+
+            throw new RuntimeException(
+                    "You are not authorized to edit this quotation"
+            );
+        }
+
+        Quotation quotation =
+                quotationRepository.findByServiceRequest(serviceRequest)
+                        .orElseThrow(() ->
+                                new RuntimeException("Quotation not found"));
+        if (!"QUOTATION_PENDING".equals(serviceRequest.getStatus())) {
+
+            throw new RuntimeException(
+                    "Quotation cannot be edited because the service request is no longer awaiting quotation"
+            );
+        }
+        if (!"PENDING".equals(quotation.getPaymentStatus())) {
+
+            throw new RuntimeException(
+                    "Quotation can only be edited while it is pending"
+            );
+        }
+
+        if (updatedQuotation.getLabourCharge() == null ||
+                updatedQuotation.getLabourCharge().doubleValue() < 0) {
+
+            throw new RuntimeException(
+                    "Invalid labour charge"
+            );
+        }
+
+        if (updatedQuotation.getPartsCharge() == null ||
+                updatedQuotation.getPartsCharge().doubleValue() < 0) {
+
+            throw new RuntimeException(
+                    "Invalid parts charge"
+            );
+        }
+
+        if (updatedQuotation.getTravelFee() == null ||
+                updatedQuotation.getTravelFee().doubleValue() < 0) {
+
+            throw new RuntimeException(
+                    "Invalid travel fee"
+            );
+        }
+
+        quotation.setLabourCharge(
+                updatedQuotation.getLabourCharge()
+        );
+
+        quotation.setPartsCharge(
+                updatedQuotation.getPartsCharge()
+        );
+
+        quotation.setTravelFee(
+                updatedQuotation.getTravelFee()
+        );
+
+        double total =
+                updatedQuotation.getLabourCharge()
+                        + updatedQuotation.getPartsCharge()
+                        + updatedQuotation.getTravelFee();
+
+        quotation.setTotalAmount(total);
 
         return quotationRepository.save(quotation);
     }

@@ -18,17 +18,20 @@ public class ReviewService {
     private final ServiceRequestRepository serviceRequestRepository;
     private final UserRepository userRepository;
     private final MechanicRepository mechanicRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReviewService(
             ReviewRepository reviewRepository,
             ServiceRequestRepository serviceRequestRepository,
             UserRepository userRepository,
-            MechanicRepository mechanicRepository
+            MechanicRepository mechanicRepository,
+            PaymentRepository paymentRepository
     ) {
         this.reviewRepository = reviewRepository;
         this.serviceRequestRepository = serviceRequestRepository;
         this.userRepository = userRepository;
         this.mechanicRepository = mechanicRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     public Review addReview(Long requestId, Review review) {
@@ -36,8 +39,23 @@ public class ReviewService {
         ServiceRequest serviceRequest = serviceRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Service request not found"));
 
-        if (!serviceRequest.getStatus().equals("COMPLETED")) {
-            throw new RuntimeException("Review can only be added after service completion");
+        if (!serviceRequest.getStatus().equals("CLOSED")) {
+            throw new RuntimeException(
+                    "Review can only be added after payment is completed"
+            );
+        }
+
+        Payment payment = paymentRepository
+                .findByQuotation_ServiceRequest_Id(requestId)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Payment must be completed before reviewing"
+                        ));
+
+        if (!"SUCCESS".equals(payment.getPaymentStatus())) {
+            throw new RuntimeException(
+                    "Payment must be successful before reviewing"
+            );
         }
 
         if (reviewRepository.findByServiceRequest(serviceRequest).isPresent()) {
@@ -58,6 +76,19 @@ public class ReviewService {
         review.setCreatedAt(LocalDateTime.now());
 
         return reviewRepository.save(review);
+    }
+    public List<Review> getMyReviews() {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User customer = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Customer not found"));
+
+        return reviewRepository.findByCustomer(customer);
     }
     public List<Review> getReviewsByMechanic(Long mechanicId) {
 

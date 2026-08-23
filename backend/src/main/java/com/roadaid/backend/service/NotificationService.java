@@ -18,6 +18,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
 
+
     public NotificationService(NotificationRepository notificationRepository,
                                UserRepository userRepository) {
         this.notificationRepository = notificationRepository;
@@ -45,6 +46,17 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
+    public Notification notifyUser(User user, String message) {
+
+        Notification notification = new Notification();
+
+        notification.setUser(user);
+        notification.setMessage(message);
+        notification.setRead(false);
+        notification.setCreatedAt(LocalDateTime.now());
+
+        return notificationRepository.save(notification);
+    }
     public List<Notification> getMyNotifications() {
 
         User user = getCurrentUser();

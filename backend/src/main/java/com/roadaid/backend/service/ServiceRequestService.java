@@ -1,5 +1,5 @@
 package com.roadaid.backend.service;
-
+import com.roadaid.backend.service.NotificationService;
 import com.roadaid.backend.dto.CustomerRequestSummaryResponse;
 import com.roadaid.backend.dto.MechanicRequestSummaryResponse;
 import com.roadaid.backend.dto.RequestDetailsResponse;
@@ -31,13 +31,15 @@ public class ServiceRequestService {
     private final MechanicRepository mechanicRepository;
     private final FileStorageService fileStorageService;
     private final RequestImageRepository requestImageRepository;
+    private final NotificationService notificationService;
     public ServiceRequestService(
             ServiceRequestRepository serviceRequestRepository,
             UserRepository userRepository,
             VehicleRepository vehicleRepository,
             MechanicRepository mechanicRepository,
             FileStorageService fileStorageService,
-            RequestImageRepository requestImageRepository
+            RequestImageRepository requestImageRepository,
+             NotificationService notificationService
     ) {
         this.serviceRequestRepository = serviceRequestRepository;
         this.userRepository = userRepository;
@@ -45,10 +47,12 @@ public class ServiceRequestService {
         this.mechanicRepository = mechanicRepository;
         this.fileStorageService = fileStorageService;
         this.requestImageRepository = requestImageRepository;
+        this.notificationService = notificationService;
     }
     public ServiceRequest createRequest(
             ServiceRequest serviceRequest,
             Long vehicleId,
+            Long mechanicId,
             List<MultipartFile> images
     ) throws IOException {
 
@@ -60,6 +64,8 @@ public class ServiceRequestService {
 
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+        Mechanic mechanic = mechanicRepository.findById(mechanicId)
+                .orElseThrow(() -> new RuntimeException("Mechanic not found"));
 
         if (!vehicle.getUser().getId().equals(customer.getId())) {
             throw new RuntimeException("You can only create requests for your own vehicles");
@@ -67,10 +73,16 @@ public class ServiceRequestService {
 
         serviceRequest.setCustomer(customer);
         serviceRequest.setVehicle(vehicle);
+        serviceRequest.setMechanic(mechanic);
         serviceRequest.setCreatedAt(LocalDateTime.now());
         serviceRequest.setStatus("PENDING");
 
         ServiceRequest savedRequest = serviceRequestRepository.save(serviceRequest);
+        notificationService.notifyUser(
+                mechanic.getUser(),
+                "New service request received. Request #" +
+                        savedRequest.getId()
+        );
 
         if (images != null && !images.isEmpty()) {
             for (MultipartFile image : images) {
@@ -110,7 +122,20 @@ public class ServiceRequestService {
         serviceRequest.setMechanic(mechanic);
         serviceRequest.setStatus("WAITING_FOR_QUOTATION");
 
-        return serviceRequestRepository.save(serviceRequest);
+        ServiceRequest savedRequest =
+                serviceRequestRepository.save(serviceRequest);
+
+        notificationService.notifyUser(
+
+                savedRequest.getCustomer(),
+                "Your service request #" +
+                        savedRequest.getId() +
+                        " has been accepted by " +
+                        mechanic.getUser().getFullName() +
+                        "."
+        );
+
+        return savedRequest;
     }
     public List<ServiceRequest> getMyAssignedRequests() {
 
@@ -205,11 +230,152 @@ public class ServiceRequestService {
     }
     public ServiceRequest rejectRequest(Long requestId) {
 
-        ServiceRequest serviceRequest = serviceRequestRepository
-                .findByIdAndStatus(requestId, "WAITING_FOR_QUOTATION")
-                .orElseThrow(() -> new RuntimeException("Request not found or cannot be rejected"));
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
+        String email = authentication.getName();
+
+        User mechanicUser = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        Mechanic mechanic = mechanicRepository.findByUser(mechanicUser)
+                .orElseThrow(() ->
+                        new RuntimeException("Mechanic profile not found"));
+
+        ServiceRequest serviceRequest =
+                serviceRequestRepository
+                        .findByIdAndStatus(requestId, "PENDING")
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Request not found or cannot be rejected"
+                                ));
+
+        // Make sure this mechanic is actually assigned to this request
+        if (serviceRequest.getMechanic() == null ||
+                !serviceRequest.getMechanic().getId().equals(mechanic.getId())) {
+
+            throw new RuntimeException(
+                    "You are not assigned to this request"
+            );
+        }
+
+        // Remember which mechanic rejected the request
+        serviceRequest.setRejectedByMechanic(mechanic);
+
+        // Remove the current assignment
         serviceRequest.setMechanic(null);
+
+        // Mark request as rejected
+        serviceRequest.setStatus("REJECTED");
+
+        return serviceRequestRepository.save(serviceRequest);
+    }
+    public ServiceRequest reassignMechanic(
+            Long requestId,
+            Long mechanicId
+    ) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User customer = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        ServiceRequest serviceRequest =
+                serviceRequestRepository
+                        .findByIdAndCustomer(requestId, customer)
+                        .orElseThrow(() ->
+                                new RuntimeException("Request not found"));
+
+        if (!"REJECTED".equals(serviceRequest.getStatus())) {
+            throw new RuntimeException(
+                    "Only rejected requests can be reassigned. Current status: "
+                            + serviceRequest.getStatus()
+            );
+        }
+
+        Mechanic mechanic = mechanicRepository.findById(mechanicId)
+                .orElseThrow(() ->
+                        new RuntimeException("Mechanic not found"));
+
+        if (!Boolean.TRUE.equals(mechanic.getAvailable())) {
+            throw new RuntimeException(
+                    "Selected mechanic is not available"
+            );
+        }
+
+        // Do not allow the mechanic who rejected this request
+        // to be selected again.
+        if (serviceRequest.getRejectedByMechanic() != null &&
+                serviceRequest.getRejectedByMechanic()
+                        .getId()
+                        .equals(mechanic.getId())) {
+
+            throw new RuntimeException(
+                    "This mechanic already rejected this request. " +
+                            "Please choose another mechanic."
+            );
+        }
+
+        serviceRequest.setMechanic(mechanic);
+
+        // Reassignment succeeded, so clear the previous rejection.
+        serviceRequest.setRejectedByMechanic(null);
+
+        serviceRequest.setStatus("PENDING");
+
+        return serviceRequestRepository.save(serviceRequest);
+    }
+    public ServiceRequest autoReassignMechanic(Long requestId) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User customer = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        ServiceRequest serviceRequest =
+                serviceRequestRepository
+                        .findByIdAndCustomer(requestId, customer)
+                        .orElseThrow(() ->
+                                new RuntimeException("Request not found"));
+
+        if (!"REJECTED".equals(serviceRequest.getStatus())) {
+            throw new RuntimeException(
+                    "Only rejected requests can be reassigned. Current status: "
+                            + serviceRequest.getStatus()
+            );
+        }
+
+        List<Mechanic> availableMechanics =
+                mechanicRepository.findByAvailableTrue();
+
+        Mechanic rejectedMechanic =
+                serviceRequest.getRejectedByMechanic();
+
+        // Remove the mechanic who rejected this request.
+        availableMechanics.removeIf(mechanic ->
+                rejectedMechanic != null &&
+                        mechanic.getId().equals(rejectedMechanic.getId())
+        );
+
+        if (availableMechanics.isEmpty()) {
+            throw new RuntimeException(
+                    "No other mechanics are currently available for this request."
+            );
+        }
+
+        Mechanic mechanic = availableMechanics.get(0);
+
+        serviceRequest.setMechanic(mechanic);
+        serviceRequest.setRejectedByMechanic(null);
         serviceRequest.setStatus("PENDING");
 
         return serviceRequestRepository.save(serviceRequest);
@@ -338,6 +504,86 @@ public class ServiceRequestService {
             return response;
 
         }).toList();
+    }
+    public RequestDetailsResponse getMechanicRequestDetails(Long requestId) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        Mechanic mechanic =
+                mechanicRepository.findByUser(user)
+                        .orElseThrow(() ->
+                                new RuntimeException("Mechanic not found"));
+
+        ServiceRequest request =
+                serviceRequestRepository
+                        .findByIdAndMechanic(requestId, mechanic)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Request not found or not assigned to you"
+                                ));
+
+        List<String> images =
+                requestImageRepository
+                        .findByServiceRequest(request)
+                        .stream()
+                        .map(RequestImage::getImageUrl)
+                        .toList();
+
+        RequestDetailsResponse response =
+                new RequestDetailsResponse();
+
+        response.setRequestId(request.getId());
+
+        response.setCustomerName(
+                request.getCustomer().getFullName()
+        );
+
+        response.setVehicle(
+                request.getVehicle().getBrand()
+                        + " "
+                        + request.getVehicle().getModel()
+        );
+
+        response.setIssueDescription(
+                request.getIssueDescription()
+        );
+
+        response.setLocation(
+                request.getLocation()
+        );
+
+        response.setStatus(
+                request.getStatus()
+        );
+
+        if (request.getMechanic() != null) {
+
+            response.setMechanicName(
+                    request.getMechanic()
+                            .getUser()
+                            .getFullName()
+            );
+
+        } else {
+
+            response.setMechanicName("Not Assigned");
+
+        }
+
+        response.setCreatedAt(
+                request.getCreatedAt()
+        );
+
+        response.setImages(images);
+
+        return response;
     }
 
 

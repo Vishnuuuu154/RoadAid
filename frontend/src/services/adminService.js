@@ -28,3 +28,13 @@ export const getRequests = (status = "", customer = "") => {
 export const getComplaints = () => {
     return api.get("/admin/complaints");
 };
+export const getMechanics = (search = "") => {
+    return api.get("/admin/mechanics", {
+        params: {
+            search
+        }
+    });
+};
+export const getAnalytics = () => {
+    return api.get("/admin/analytics");
+};
