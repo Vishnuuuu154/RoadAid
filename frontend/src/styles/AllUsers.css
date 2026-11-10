@@ -1,0 +1,733 @@
+/* ==========================================================================
+   Admin: All Users
+   Calm, spacious layout. Same ink + amber set as the other admin pages.
+   Classes use the au- prefix and live under .au-root.
+   ========================================================================== */
+
+.au-root {
+    --au-ink: #181b24;
+    --au-text: #3b4150;
+    --au-muted: #6b7280;
+    --au-line: #e8eaee;
+    --au-line-soft: #f1f2f5;
+    --au-surface: #ffffff;
+    --au-field: #f6f7f9;
+    --au-accent: #e8912a;
+    --au-accent-strong: #b8650a;
+    --au-accent-soft: #fdf1e2;
+    --au-green: #17794c;
+    --au-green-solid: #1f9d63;
+    --au-green-soft: #e9f7f0;
+    --au-red: #c0392b;
+    --au-red-soft: #fdecea;
+    --au-red-line: #f5c6c8;
+
+    --au-cols: minmax(0, 2.2fr) 140px 120px 110px 130px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--au-text);
+    font-feature-settings: "tnum" 1;
+}
+
+.au-root *,
+.au-root *::before,
+.au-root *::after {
+    box-sizing: border-box;
+}
+
+.au-root h1,
+.au-root h2,
+.au-root p {
+    margin: 0;
+    padding: 0;
+}
+
+.au-root button,
+.au-root input,
+.au-root select {
+    font-family: inherit;
+}
+
+.au-root :focus-visible {
+    outline: 3px solid rgba(232, 145, 42, 0.6);
+    outline-offset: 2px;
+}
+
+/* ---------- Header ---------- */
+
+.au-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.au-title {
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--au-ink);
+}
+
+.au-sub {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--au-muted);
+}
+
+.au-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* ---------- Buttons ---------- */
+
+.au-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--au-ink);
+    background: var(--au-surface);
+    border: 1px solid var(--au-line);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.au-btn:hover:not(:disabled) {
+    background: var(--au-field);
+}
+
+.au-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.au-btn-sm {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 13px;
+}
+
+.au-btn-outline-danger {
+    color: var(--au-red);
+    border-color: var(--au-red-line);
+}
+
+.au-btn-outline-danger:hover:not(:disabled) {
+    background: var(--au-red-soft);
+}
+
+.au-btn-outline-ok {
+    color: var(--au-green);
+    border-color: #bfe6d3;
+}
+
+.au-btn-outline-ok:hover:not(:disabled) {
+    background: var(--au-green-soft);
+}
+
+.au-btn-danger {
+    flex: 1;
+    color: #fff;
+    background: var(--au-red);
+    border-color: var(--au-red);
+}
+
+.au-btn-danger:hover:not(:disabled) {
+    background: #a52f23;
+}
+
+.au-btn-ok {
+    flex: 1;
+    color: #fff;
+    background: var(--au-green-solid);
+    border-color: var(--au-green-solid);
+}
+
+.au-btn-ok:hover:not(:disabled) {
+    background: var(--au-green);
+}
+
+.au-spin {
+    animation: au-rotate 0.8s linear infinite;
+}
+
+@keyframes au-rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ---------- Error ---------- */
+
+.au-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--au-red);
+    background: var(--au-red-soft);
+    border: 1px solid var(--au-red-line);
+    border-radius: 12px;
+}
+
+.au-error span {
+    flex: 1;
+}
+
+.au-error button {
+    padding: 6px 12px;
+    font-weight: 700;
+    color: var(--au-red);
+    background: #fff;
+    border: 1px solid var(--au-red-line);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* ---------- Role tabs (underline style) ---------- */
+
+.au-tabs {
+    display: flex;
+    gap: 28px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--au-line);
+    scrollbar-width: none;
+}
+
+.au-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.au-tab {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 0 14px;
+    margin-bottom: -1px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--au-muted);
+    background: none;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+}
+
+.au-tab span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #9aa0ab;
+}
+
+.au-tab:hover {
+    color: var(--au-ink);
+}
+
+.au-tab[aria-pressed="true"] {
+    font-weight: 800;
+    color: var(--au-ink);
+    border-bottom-color: var(--au-accent);
+}
+
+.au-tab[aria-pressed="true"] span {
+    color: var(--au-accent-strong);
+}
+
+/* ---------- Filters ---------- */
+
+.au-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.au-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 280px;
+    max-width: 460px;
+    min-height: 44px;
+    padding: 0 8px 0 14px;
+    color: var(--au-muted);
+    background: var(--au-surface);
+    border: 1px solid var(--au-line);
+    border-radius: 12px;
+}
+
+.au-search:focus-within {
+    border-color: var(--au-accent);
+}
+
+.au-search input {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    color: var(--au-ink);
+    background: transparent;
+    border: 0;
+    outline: 0;
+}
+
+.au-clear {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--au-muted);
+    background: var(--au-line-soft);
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.au-select {
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--au-ink);
+    background: var(--au-surface);
+    border: 1px solid var(--au-line);
+    border-radius: 12px;
+}
+
+.au-link-btn {
+    padding: 8px 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--au-accent-strong);
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+.au-link-btn:hover {
+    text-decoration: underline;
+}
+
+/* ---------- List ---------- */
+
+.au-list {
+    overflow: hidden;
+    background: var(--au-surface);
+    border: 1px solid var(--au-line);
+    border-radius: 16px;
+}
+
+.au-head,
+.au-row {
+    display: grid;
+    grid-template-columns: var(--au-cols);
+    align-items: center;
+    gap: 20px;
+    padding: 0 24px;
+}
+
+.au-head {
+    min-height: 46px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #9aa0ab;
+    border-bottom: 1px solid var(--au-line);
+}
+
+.au-row {
+    min-height: 72px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--au-line-soft);
+    transition: background 0.12s;
+}
+
+.au-row:last-child {
+    border-bottom: 0;
+}
+
+.au-row:hover {
+    background: #fafafb;
+}
+
+.au-row > span {
+    min-width: 0;
+}
+
+.au-user {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.au-avatar {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--au-accent-strong);
+    background: var(--au-accent-soft);
+    border-radius: 50%;
+}
+
+.au-user-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.35;
+}
+
+.au-name {
+    font-weight: 700;
+    color: var(--au-ink);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.au-name:hover {
+    text-decoration: underline;
+}
+
+.au-user-text small {
+    font-size: 13px;
+    color: var(--au-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.au-role {
+    font-weight: 600;
+    color: var(--au-ink);
+}
+
+.au-muted {
+    color: var(--au-text);
+}
+
+.au-action {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* ---------- Status ---------- */
+
+.au-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--au-ink);
+}
+
+.au-status i {
+    width: 9px;
+    height: 9px;
+    flex-shrink: 0;
+    background: #d6393f;
+    border-radius: 50%;
+}
+
+.au-status[data-active="true"] i {
+    background: #1f9d63;
+}
+
+/* ---------- Show more ---------- */
+
+.au-more {
+    align-self: center;
+    min-height: 42px;
+    padding: 0 22px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--au-ink);
+    background: var(--au-surface);
+    border: 1px solid var(--au-line);
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.au-more span {
+    font-weight: 500;
+    color: var(--au-muted);
+}
+
+.au-more:hover {
+    background: var(--au-field);
+}
+
+/* ---------- Empty states ---------- */
+
+.au-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 64px 20px;
+    text-align: center;
+    background: var(--au-surface);
+    border: 1px solid var(--au-line);
+    border-radius: 16px;
+}
+
+.au-empty h2 {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--au-ink);
+}
+
+.au-empty p {
+    margin-bottom: 6px;
+    color: var(--au-muted);
+}
+
+.au-empty-icon {
+    width: 64px;
+    height: 64px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: var(--au-muted);
+    background: var(--au-field);
+    border-radius: 50%;
+}
+
+/* ---------- Skeleton ---------- */
+
+.au-skel-row {
+    grid-template-columns: minmax(0, 1fr) 110px 130px;
+    cursor: default;
+}
+
+.au-skel {
+    display: block;
+    height: 16px;
+    background: linear-gradient(90deg, var(--au-line-soft) 25%, var(--au-line) 50%, var(--au-line-soft) 75%);
+    background-size: 200% 100%;
+    border-radius: 8px;
+    animation: au-shimmer 1.3s ease-in-out infinite;
+}
+
+@keyframes au-shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+/* ---------- Dialog + toast ---------- */
+
+.au-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1080;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(16, 20, 27, 0.55);
+}
+
+.au-dialog {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 420px;
+    padding: 26px 24px 22px;
+    text-align: center;
+    background: var(--au-surface);
+    border-radius: 18px;
+    box-shadow: 0 10px 28px rgba(16, 24, 40, 0.18);
+}
+
+.au-dialog h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--au-ink);
+    overflow-wrap: anywhere;
+}
+
+.au-dialog-icon {
+    align-self: center;
+    width: 56px;
+    height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--au-green);
+    background: var(--au-green-soft);
+    border-radius: 50%;
+}
+
+.au-dialog-icon[data-danger="true"] {
+    color: var(--au-red);
+    background: var(--au-red-soft);
+}
+
+.au-dialog-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.au-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    z-index: 1090;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: calc(100vw - 32px);
+    padding: 12px 18px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--au-ink);
+    border-radius: 14px;
+    box-shadow: 0 10px 28px rgba(16, 24, 40, 0.18);
+    transform: translateX(-50%);
+    animation: au-toast-in 0.2s ease-out;
+}
+
+.au-toast-ok svg {
+    color: #5fd39b;
+}
+
+.au-toast-error {
+    background: var(--au-red);
+}
+
+@keyframes au-toast-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 10px);
+    }
+}
+
+/* ---------- Narrower screens ---------- */
+
+@media (max-width: 1000px) {
+    /* The joined date drops out so nothing gets squeezed. */
+    .au-root {
+        --au-cols: minmax(0, 2fr) 130px 110px 120px;
+    }
+
+    .au-head span:nth-child(3),
+    .au-row > span:nth-child(3) {
+        display: none;
+    }
+}
+
+/* ---------- Phones: one tidy card per user ---------- */
+
+@media (max-width: 700px) {
+    .au-root {
+        gap: 20px;
+    }
+
+    .au-title {
+        font-size: 24px;
+    }
+
+    .au-tabs {
+        gap: 22px;
+    }
+
+    .au-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow: visible;
+        background: none;
+        border: 0;
+    }
+
+    .au-head {
+        display: none;
+    }
+
+    .au-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px 12px;
+        min-height: 0;
+        padding: 16px;
+        background: var(--au-surface);
+        border: 1px solid var(--au-line) !important;
+        border-radius: 14px;
+    }
+
+    .au-row .au-user {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+
+    .au-row .au-role {
+        grid-column: 1;
+        grid-row: 2;
+        font-size: 14px;
+    }
+
+    .au-row .au-status {
+        grid-column: 1;
+        grid-row: 3;
+    }
+
+    .au-row .au-action {
+        grid-column: 2;
+        grid-row: 2 / span 2;
+        align-self: center;
+    }
+
+    .au-row > span:nth-child(3) {
+        display: none;
+    }
+
+    .au-search {
+        max-width: none;
+    }
+
+    .au-select {
+        flex: 1;
+    }
+
+    .au-skel-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .au-spin,
+    .au-skel,
+    .au-toast {
+        animation: none;
+    }
+
+    .au-row {
+        transition: none;
+    }
+}

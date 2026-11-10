@@ -1,0 +1,600 @@
+/* ==========================================================================
+   RoadAid: Register page additions
+   Sits beside auth.css and reuses its colour tokens (--auth-*).
+   Everything is scoped under .auth-page so nothing leaks to other pages.
+   ========================================================================== */
+
+/* ---------- Role choice (first screen) ---------- */
+
+.auth-page .reg-role-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.auth-page .reg-role-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    padding: 20px;
+    text-align: left;
+    background: var(--auth-surface);
+    border: 1.5px solid var(--auth-border);
+    border-radius: var(--auth-radius-lg);
+    font-family: inherit;
+    color: var(--auth-ink);
+    cursor: pointer;
+    transition: border-color var(--auth-transition), box-shadow var(--auth-transition),
+    transform var(--auth-transition);
+}
+
+.auth-page .reg-role-card:hover {
+    border-color: var(--auth-accent);
+    box-shadow: 0 10px 28px -14px rgba(16, 20, 27, 0.28);
+    transform: translateY(-2px);
+}
+
+.auth-page .reg-role-card:active {
+    transform: translateY(0) scale(0.995);
+}
+
+.auth-page .reg-role-card[aria-pressed="true"] {
+    border-color: var(--auth-accent);
+    box-shadow: 0 0 0 3px var(--auth-accent-soft);
+}
+
+.auth-page .reg-role-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.auth-page .reg-role-icon {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    background: var(--auth-accent-soft);
+    color: var(--auth-accent-strong);
+}
+
+.auth-page .reg-role-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.auth-page .reg-role-title {
+    font-family: var(--auth-font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--auth-ink);
+}
+
+.auth-page .reg-role-desc {
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--auth-muted);
+}
+
+.auth-page .reg-role-perks {
+    list-style: none;
+    margin: 0;
+    padding: 14px 0 0;
+    border-top: 1px solid var(--auth-border);
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.auth-page .reg-role-perks li {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--auth-ink-soft);
+}
+
+.auth-page .reg-role-perks svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--auth-success);
+}
+
+.auth-page .reg-role-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.auth-page .reg-role-note {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--auth-info);
+}
+
+.auth-page .reg-role-note svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.auth-page .reg-role-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--auth-ink);
+}
+
+.auth-page .reg-role-card:hover .reg-role-go svg {
+    transform: translateX(3px);
+}
+
+.auth-page .reg-role-go svg {
+    transition: transform var(--auth-transition);
+}
+
+/* ---------- "Signing up as ..." chip ---------- */
+
+.auth-page .reg-role-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 4px 6px 4px 12px;
+    background: var(--auth-field);
+    border-radius: 999px;
+}
+
+.auth-page .reg-role-chip-icon {
+    display: inline-flex;
+    color: var(--auth-accent-strong);
+}
+
+.auth-page .reg-role-chip-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.9rem;
+    color: var(--auth-ink-soft);
+}
+
+.auth-page .reg-role-chip-text strong {
+    color: var(--auth-ink);
+}
+
+/* ---------- Step indicator (mechanic sign-up) ---------- */
+
+.auth-page .reg-steps {
+    margin-bottom: 18px;
+}
+
+.auth-page .reg-step-label {
+    margin: 0 0 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--auth-accent-strong);
+}
+
+.auth-page .reg-progress {
+    display: flex;
+    gap: 6px;
+}
+
+.auth-page .reg-progress-seg {
+    flex: 1;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--auth-border);
+    transition: background var(--auth-transition);
+}
+
+.auth-page .reg-progress-seg[data-state="on"] {
+    background: var(--auth-accent);
+}
+
+/* ---------- Small form helpers ---------- */
+
+/* Errors under the shared password component need the same spacing as .field-error under a field. */
+.auth-page .reg-field-error {
+    margin: -10px 0 18px;
+}
+
+.auth-page .field-ok {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0 0;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--auth-success);
+}
+
+.auth-page .reg-terms-field {
+    margin-bottom: 22px;
+}
+
+.auth-page .reg-terms,
+.auth-page .reg-contact .checkbox-field {
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.auth-page .reg-terms input,
+.auth-page .reg-contact .checkbox-field input {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+}
+
+.auth-page .reg-contact {
+    margin-bottom: 18px;
+}
+
+.auth-page .reg-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.auth-page .reg-actions .btn-primary {
+    flex: 1;
+}
+
+.auth-page .reg-back {
+    flex-shrink: 0;
+    width: auto;
+}
+
+/* ---------- Success panel: what happens next ---------- */
+
+.auth-page .reg-next {
+    list-style: none;
+    margin: 0 auto 26px;
+    padding: 0;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+}
+
+.auth-page .reg-next li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.94rem;
+    line-height: 1.5;
+    color: var(--auth-ink-soft);
+}
+
+.auth-page .reg-next-num {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--auth-accent-soft);
+    color: var(--auth-accent-strong);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+/* ---------- Small phones ---------- */
+
+@media (max-width: 420px) {
+    .auth-page .reg-role-card {
+        padding: 16px;
+    }
+
+    .auth-page .reg-role-icon {
+        width: 46px;
+        height: 46px;
+    }
+
+    .auth-page .reg-role-foot {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .auth-page .reg-actions {
+        flex-direction: column-reverse;
+    }
+
+    .auth-page .reg-back {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-page .reg-role-card,
+    .auth-page .reg-role-go svg {
+        transition: none;
+    }
+
+    .auth-page .reg-role-card:hover {
+        transform: none;
+    }
+}
+
+/* ==========================================================================
+   Towing provider sign-up additions
+   Only new classes below — nothing above this line is touched.
+   ========================================================================== */
+
+/* ---------- Optional-field tag ---------- */
+
+.auth-page .prov-optional-tag {
+    font-weight: 500;
+    color: var(--auth-muted);
+}
+
+/* ---------- Business type segmented control ---------- */
+
+.auth-page .prov-segmented {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.auth-page .prov-segmented-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 0;
+    min-width: 108px;
+    justify-content: center;
+    padding: 12px 14px;
+    background: var(--auth-field);
+    border: 1.5px solid var(--auth-border);
+    border-radius: var(--auth-radius-lg);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--auth-ink-soft);
+    cursor: pointer;
+    transition: border-color var(--auth-transition), background var(--auth-transition),
+    color var(--auth-transition), box-shadow var(--auth-transition);
+}
+
+.auth-page .prov-segmented-option:hover {
+    border-color: var(--auth-accent);
+    color: var(--auth-ink);
+}
+
+.auth-page .prov-segmented-option[data-selected="true"] {
+    background: var(--auth-accent-soft);
+    border-color: var(--auth-accent);
+    color: var(--auth-accent-strong);
+    box-shadow: 0 0 0 3px var(--auth-accent-soft);
+}
+
+/* ---------- Document upload ---------- */
+
+.auth-page .prov-upload-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.auth-page .prov-upload-dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 24px 16px;
+    text-align: center;
+    background: var(--auth-field);
+    border: 1.5px dashed var(--auth-border);
+    border-radius: var(--auth-radius-lg);
+    color: var(--auth-ink-soft);
+    font-family: inherit;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: border-color var(--auth-transition), background var(--auth-transition);
+}
+
+.auth-page .prov-upload-dropzone svg {
+    color: var(--auth-accent-strong);
+    margin-bottom: 2px;
+}
+
+.auth-page .prov-upload-dropzone strong {
+    color: var(--auth-ink);
+}
+
+.auth-page .prov-upload-dropzone:hover,
+.auth-page .prov-upload-dropzone[data-active="true"] {
+    border-color: var(--auth-accent);
+    background: var(--auth-accent-soft);
+}
+
+.auth-page .prov-upload-types {
+    font-size: 0.78rem;
+    color: var(--auth-muted);
+}
+
+.auth-page .prov-upload-file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--auth-field);
+    border: 1.5px solid var(--auth-border);
+    border-radius: var(--auth-radius-lg);
+}
+
+.auth-page .prov-upload-file-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--auth-accent-strong);
+}
+
+.auth-page .prov-upload-file-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.auth-page .prov-upload-file-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--auth-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.auth-page .prov-upload-file-size {
+    font-size: 0.78rem;
+    color: var(--auth-muted);
+}
+
+.auth-page .prov-upload-replace {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--auth-accent-strong);
+    cursor: pointer;
+    padding: 4px 2px;
+}
+
+.auth-page .prov-upload-replace:hover {
+    text-decoration: underline;
+}
+
+.auth-page .prov-upload-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    color: var(--auth-muted);
+    cursor: pointer;
+    transition: background var(--auth-transition), color var(--auth-transition);
+}
+
+.auth-page .prov-upload-remove:hover {
+    background: var(--auth-border);
+    color: var(--auth-ink);
+}
+
+/* ---------- Review screen ---------- */
+
+.auth-page .prov-review-section {
+    margin-bottom: 20px;
+    padding: 16px 18px;
+    background: var(--auth-field);
+    border: 1.5px solid var(--auth-border);
+    border-radius: var(--auth-radius-lg);
+}
+
+.auth-page .prov-review-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.auth-page .prov-review-section-head h3 {
+    margin: 0;
+    font-family: var(--auth-font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--auth-ink);
+}
+
+.auth-page .prov-review-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 7px 0;
+    border-top: 1px solid var(--auth-border);
+    font-size: 0.88rem;
+}
+
+.auth-page .prov-review-row:first-of-type {
+    border-top: none;
+}
+
+.auth-page .prov-review-row-label {
+    flex-shrink: 0;
+    color: var(--auth-muted);
+}
+
+.auth-page .prov-review-row-value {
+    text-align: right;
+    color: var(--auth-ink);
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.auth-page .prov-review-row-value em {
+    font-weight: 500;
+    font-style: normal;
+    color: var(--auth-muted);
+}
+
+/* ---------- Small phones ---------- */
+
+@media (max-width: 420px) {
+    .auth-page .prov-segmented-option {
+        min-width: 90px;
+        font-size: 0.84rem;
+        padding: 10px 8px;
+    }
+
+    .auth-page .prov-review-row {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .auth-page .prov-review-row-value {
+        text-align: left;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-page .prov-segmented-option,
+    .auth-page .prov-upload-dropzone,
+    .auth-page .prov-upload-remove {
+        transition: none;
+    }
+}

@@ -1,0 +1,144 @@
+
+.mechanic-analytics {
+    padding: 28px;
+    color: var(--text-primary, #1f2937);
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.analytics-header h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+.analytics-header p,
+.analytics-muted {
+    color: var(--text-secondary, #6b7280);
+}
+
+.analytics-header select,
+.mechanic-analytics button {
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: var(--surface, #fff);
+    color: inherit;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.analytics-metric,
+.analytics-panel {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    padding: 20px;
+}
+
+.analytics-metric-title {
+    margin: 0;
+    color: var(--text-secondary, #6b7280);
+    font-size: 14px;
+}
+
+.analytics-metric h2 {
+    margin: 12px 0 4px;
+    font-size: 26px;
+    overflow-wrap: anywhere;
+}
+
+.analytics-metric .analytics-muted {
+    font-size: 12px;
+    margin-bottom: 0;
+}
+
+.analytics-panel {
+    margin-bottom: 24px;
+}
+
+.analytics-panel h2 {
+    margin-top: 0;
+    font-size: 19px;
+}
+
+.analytics-panel h3 {
+    margin-top: 24px;
+}
+
+.analytics-grid-compact {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 0;
+}
+
+.analytics-list-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.analytics-list-row:last-child {
+    border-bottom: none;
+}
+
+.analytics-table-wrap {
+    overflow-x: auto;
+}
+
+.analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+
+.analytics-table th,
+.analytics-table td {
+    text-align: left;
+    padding: 13px 12px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.analytics-table th {
+    font-size: 13px;
+
+}
+
+.analytics-error {
+    color: #dc2626;
+}
+
+@media (max-width: 900px) {
+    .analytics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .mechanic-analytics {
+        padding: 16px;
+    }
+
+    .analytics-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .analytics-grid,
+    .analytics-grid-compact {
+        grid-template-columns: 1fr;
+    }
+}

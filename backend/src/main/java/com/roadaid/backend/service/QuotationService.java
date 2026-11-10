@@ -21,17 +21,20 @@ public class QuotationService {
     private final ServiceRequestRepository serviceRequestRepository;
     private final MechanicRepository mechanicRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public QuotationService(
             QuotationRepository quotationRepository,
             ServiceRequestRepository serviceRequestRepository,
             MechanicRepository mechanicRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            NotificationService notificationService
     ) {
         this.quotationRepository = quotationRepository;
         this.serviceRequestRepository = serviceRequestRepository;
         this.mechanicRepository = mechanicRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
     public Quotation createQuotation(Long requestId, Quotation quotation) {
 
@@ -67,6 +70,12 @@ public class QuotationService {
 
         serviceRequest.setStatus("QUOTATION_PENDING");
         serviceRequestRepository.save(serviceRequest);
+        notificationService.notifyUser(
+                serviceRequest.getCustomer(),
+                "A new quotation has been received for request #" +
+                        serviceRequest.getId() +
+                        ". Please review it."
+        );
 
         return quotationRepository.save(quotation);
     }
@@ -109,11 +118,16 @@ public class QuotationService {
         if (!quotation.getPaymentStatus().equals("PENDING")) {
             throw new RuntimeException("Quotation already processed");
         }
-
         quotation.setPaymentStatus("ACCEPTED");
 
-        serviceRequest.setStatus("IN_PROGRESS");
+        serviceRequest.setStatus("ACCEPTED");
         serviceRequestRepository.save(serviceRequest);
+        notificationService.notifyUser(
+                serviceRequest.getMechanic().getUser(),
+                "Your quotation for request #" +
+                        serviceRequest.getId() +
+                        " has been accepted by the customer. You can start the service."
+        );
 
         System.out.println("Before Save: " + serviceRequest.getStatus());
 

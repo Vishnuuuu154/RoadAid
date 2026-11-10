@@ -1,0 +1,738 @@
+/* ==========================================================================
+   User profile + user requests (admin) — adminuserdetails.css
+   Shared by UserDetails.jsx and UserRequests.jsx. Same token system as
+   the rest of the app. Scoped under .mu.
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap");
+
+.mu {
+    --ink: #1b1e24;
+    --ink-soft: #5b6270;
+    --ink-faint: #8b909c;
+
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --border: #e4e6eb;
+    --border-strong: #d3d6dc;
+
+    --accent: #e2661f;
+    --accent-dark: #b14e16;
+    --accent-soft: #fdece0;
+
+    --success: #1e7a43;
+    --success-soft: #e9f7ef;
+
+    --danger: #c23b31;
+    --danger-soft: #fdebeb;
+    --danger-border: #f4c9c6;
+
+    --warning: #9a5b00;
+    --warning-soft: #fff4e5;
+
+    --info: #1c5aa0;
+    --info-soft: #eaf2ff;
+
+    --neutral: #676c76;
+    --neutral-soft: #f1f2f4;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--ink);
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.mu * {
+    box-sizing: border-box;
+}
+
+.mu h1, .mu h2, .mu h3 {
+    font-family: "Space Grotesk", "Inter", sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mu *, .mu *::before, .mu *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+
+.mu button:focus-visible,
+.mu [role="button"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Back link                                                               */
+/* ---------------------------------------------------------------------- */
+
+.mu-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding: 4px 0;
+    margin-bottom: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+}
+
+.mu-back:hover {
+    color: var(--ink);
+}
+
+.mu-back svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Loading / error states                                                  */
+/* ---------------------------------------------------------------------- */
+
+.mu-loading {
+    text-align: center;
+    padding: 90px 20px;
+    color: var(--ink-soft);
+}
+
+.mu-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    animation: mu-spin 0.8s linear infinite;
+}
+
+@keyframes mu-spin {
+    to { transform: rotate(360deg); }
+}
+
+.mu-error-card {
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 48px 24px;
+}
+
+.mu-error-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--danger-soft);
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.mu-error-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.mu-error-card h2 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 6px;
+}
+
+.mu-error-card p {
+    margin: 0 0 18px;
+    font-size: 14px;
+    color: var(--ink-faint);
+}
+
+.mu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--ink);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.mu-btn:hover {
+    background: #2a2d34;
+}
+
+.mu-alert-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    background: var(--danger-soft);
+    border: 1px solid var(--danger-border);
+    border-radius: var(--radius-md);
+    color: var(--danger);
+    font-size: 14px;
+}
+
+.mu-alert-banner button {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--danger);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Page header                                                              */
+/* ---------------------------------------------------------------------- */
+
+.mu-head {
+    margin-bottom: 20px;
+}
+
+.mu-head h1 {
+    font-size: 25px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
+}
+
+.mu-head p {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--ink-soft);
+}
+
+.mu-head-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.mu-total-badge {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 12px 20px;
+    background: var(--accent-soft);
+    border-radius: var(--radius-lg);
+}
+
+.mu-total-badge span:first-child {
+    font-size: 12px;
+    color: var(--accent-dark);
+    opacity: 0.85;
+}
+
+.mu-total-badge span:last-child {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent-dark);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Profile hero                                                            */
+/* ---------------------------------------------------------------------- */
+
+.mu-hero {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 20px;
+}
+
+.mu-avatar {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 700;
+    background: linear-gradient(155deg, #f0813a 0%, var(--accent) 55%, var(--accent-dark) 100%);
+    color: #fff;
+}
+
+.mu-hero h2 {
+    font-size: 21px;
+    font-weight: 600;
+    margin: 0 0 8px;
+}
+
+.mu-hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.mu-hero-meta .mu-userid {
+    font-size: 13.5px;
+    color: var(--ink-faint);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Pills                                                                    */
+/* ---------------------------------------------------------------------- */
+
+.mu-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.mu-pill__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.mu-pill--role-customer { background: var(--info-soft); color: var(--info); }
+.mu-pill--role-mechanic { background: var(--neutral-soft); color: var(--ink); }
+.mu-pill--role-default { background: var(--neutral-soft); color: var(--neutral); }
+
+.mu-pill--active { background: var(--success-soft); color: var(--success); }
+.mu-pill--active .mu-pill__dot { background: var(--success); }
+
+.mu-pill--inactive { background: var(--danger-soft); color: var(--danger); }
+.mu-pill--inactive .mu-pill__dot { background: var(--danger); }
+
+.mu-pill--available { background: var(--success-soft); color: var(--success); }
+.mu-pill--available .mu-pill__dot { background: var(--success); }
+
+.mu-pill--offline { background: var(--neutral-soft); color: var(--neutral); }
+.mu-pill--offline .mu-pill__dot { background: var(--ink-faint); }
+
+.mu-pill--approved { background: var(--success-soft); color: var(--success); }
+.mu-pill--rejected { background: var(--danger-soft); color: var(--danger); }
+.mu-pill--pending { background: var(--warning-soft); color: var(--warning); }
+
+/* ---------------------------------------------------------------------- */
+/* Info cards                                                               */
+/* ---------------------------------------------------------------------- */
+
+.mu-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 760px) {
+    .mu-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.mu-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 20px;
+}
+
+.mu-card:last-child {
+    margin-bottom: 0;
+}
+
+.mu-info-grid .mu-card {
+    margin-bottom: 0;
+}
+
+.mu-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 18px;
+}
+
+.mu-card h3 svg {
+    width: 17px;
+    height: 17px;
+    color: var(--ink-faint);
+}
+
+.mu-field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.mu-field {
+    margin-bottom: 16px;
+}
+
+.mu-field:last-child {
+    margin-bottom: 0;
+}
+
+.mu-field-label {
+    display: block;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    margin-bottom: 3px;
+}
+
+.mu-field-value {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.mu-field-value.mu-muted {
+    font-weight: 500;
+    color: var(--ink-faint);
+}
+
+.mu-rejection {
+    margin-top: 18px;
+    padding: 13px 15px;
+    background: var(--danger-soft);
+    border: 1px solid var(--danger-border);
+    border-radius: var(--radius-sm);
+    color: var(--danger);
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+
+.mu-rejection strong {
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Activity stat tiles                                                      */
+/* ---------------------------------------------------------------------- */
+
+.mu-activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+}
+
+.mu-stat-tile {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 16px 18px;
+    background: var(--bg);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    cursor: default;
+}
+
+.mu-stat-tile--link {
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.mu-stat-tile--link:hover,
+.mu-stat-tile--link:focus-visible {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+}
+
+.mu-stat-tile__label {
+    display: block;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+}
+
+.mu-stat-tile__value {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.mu-stat-tile__value.is-success { color: var(--success); }
+.mu-stat-tile__value.is-danger { color: var(--danger); }
+
+.mu-stat-tile__cta {
+    display: block;
+    margin-top: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--accent-dark);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Request table (UserRequests.jsx)                                        */
+/* ---------------------------------------------------------------------- */
+
+.mu-table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.mu-scroll {
+    overflow-x: auto;
+}
+
+.mu-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.mu-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-faint);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.mu-table th.is-end {
+    text-align: right;
+}
+
+.mu-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink);
+    vertical-align: middle;
+}
+
+.mu-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.mu-row {
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+}
+
+.mu-row:hover,
+.mu-row:focus-visible {
+    background: var(--bg);
+}
+
+.mu-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.mu-req-id {
+    font-weight: 600;
+    color: var(--ink-soft);
+}
+
+.mu-ellipsis {
+    display: inline-block;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mu-date {
+    white-space: nowrap;
+    color: var(--ink-soft);
+}
+
+.mu-action-cell {
+    text-align: right;
+}
+
+.mu-view-btn {
+    padding: 7px 15px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.mu-view-btn:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Skeleton loading rows                                                    */
+/* ---------------------------------------------------------------------- */
+
+.mu-row--skeleton {
+    cursor: default;
+    pointer-events: none;
+}
+
+.mu-row--skeleton td {
+    padding: 16px;
+}
+
+.mu-skeleton-line {
+    height: 14px;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--bg) 25%, var(--border) 50%, var(--bg) 75%);
+    background-size: 400% 100%;
+    animation: mu-shimmer 1.4s ease infinite;
+}
+
+@keyframes mu-shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Request status pill                                                      */
+/* ---------------------------------------------------------------------- */
+
+.mu-status-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.mu-status-pill--success { background: var(--success-soft); color: var(--success); }
+.mu-status-pill--danger { background: var(--danger-soft); color: var(--danger); }
+.mu-status-pill--info { background: var(--info-soft); color: var(--info); }
+.mu-status-pill--warning { background: var(--warning-soft); color: var(--warning); }
+.mu-status-pill--neutral { background: var(--neutral-soft); color: var(--neutral); }
+
+/* ---------------------------------------------------------------------- */
+/* Empty state                                                              */
+/* ---------------------------------------------------------------------- */
+
+.mu-empty {
+    text-align: center;
+    padding: 72px 20px;
+}
+
+.mu-empty svg {
+    width: 40px;
+    height: 40px;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+}
+
+.mu-empty h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    color: var(--ink);
+}
+
+.mu-empty p {
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--ink-faint);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Responsive                                                               */
+/* ---------------------------------------------------------------------- */
+
+@media (max-width: 760px) {
+    .mu-field-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mu-table thead {
+        display: none;
+    }
+
+    .mu-table, .mu-table tbody, .mu-table tr, .mu-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .mu-row {
+        padding: 14px 4px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .mu-table td {
+        border-bottom: none;
+        padding: 5px 16px;
+    }
+
+    .mu-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ink-faint);
+        margin-bottom: 3px;
+    }
+
+    .mu-action-cell {
+        text-align: left;
+        padding-top: 10px !important;
+    }
+
+    .mu-view-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 560px) {
+    .mu-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+}

@@ -12,11 +12,33 @@ export const getMyPayments = () => {
 export const getMyFavorites = () => {
     return api.get("/favorites");
 };
+export const addFavorite = (mechanicId) => {
+    return api.post(`/favorites/${mechanicId}`);
+};
+
+export const removeFavorite = (mechanicId) => {
+    return api.delete(`/favorites/${mechanicId}`);
+};
 export const getMyNotifications = () => {
     return api.get("/notifications");
 };
 export const getAvailableMechanics = () => {
     return api.get("/mechanics");
+};
+export const getNearbyMechanics = (
+    latitude,
+    longitude,
+    radius = 10
+) => {
+    return api.get("/mechanics/nearby", {
+        params: {
+            latitude,
+            longitude,
+            radius
+        }
+    });
+
+
 };
 
 
@@ -74,3 +96,22 @@ export const addReview = (requestId, reviewData) => {
 export const getMyReviews = () => {
     return api.get("/reviews/my");
 };
+export const getLiveTracking = (requestId) => {
+    return api.get(`/requests/${requestId}/tracking`);
+};
+export const createComplaint = (complaintData) => {
+    return api.post("/complaints", complaintData);
+};
+
+export const getMyComplaints = () => {
+    return api.get("/complaints/my");
+};
+export const getMyConversations = () => {
+    return api.get("/messages/conversations");
+};
+// Add this export to src/services/customerService.js (the existing api client adds your JWT).
+export const getFuelStations = (latitude, longitude, radiusKm = 5, category = "FUEL", signal) =>
+    api.get("/map/fuel-stations", {
+        params: { lat: latitude, lng: longitude, radiusKm, category },
+        signal,
+    });

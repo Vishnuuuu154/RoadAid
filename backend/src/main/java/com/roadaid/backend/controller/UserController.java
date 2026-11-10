@@ -42,7 +42,8 @@ public class UserController {
 
         return userService.updateProfile(
                 request.get("fullName"),
-                request.get("phone")
+                request.get("phone"),
+                request.get("profileImage")
         );
     }
 
@@ -68,5 +69,28 @@ public class UserController {
         );
 
         return "Account deleted successfully";
+    }
+    @PostMapping("/forgot-password")
+    public String forgotPassword(
+            @RequestBody Map<String, String> request
+    ) {
+
+        userService.forgotPassword(
+                request.get("email")
+        );
+
+        return "If an account exists with this email, a password reset link has been sent.";
+    }
+    @PostMapping("/reset-password")
+    public String resetPassword(
+            @RequestBody Map<String, String> request
+    ) {
+
+        userService.resetPassword(
+                request.get("token"),
+                request.get("newPassword")
+        );
+
+        return "Password reset successfully.";
     }
 }

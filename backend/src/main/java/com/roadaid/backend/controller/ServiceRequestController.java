@@ -1,9 +1,6 @@
 package com.roadaid.backend.controller;
 
-import com.roadaid.backend.dto.CustomerRequestSummaryResponse;
-import com.roadaid.backend.dto.MechanicRequestSummaryResponse;
-import com.roadaid.backend.dto.RequestDetailsResponse;
-import com.roadaid.backend.dto.RequestImageResponse;
+import com.roadaid.backend.dto.*;
 import com.roadaid.backend.entity.ServiceRequest;
 import com.roadaid.backend.service.ServiceRequestService;
 import org.springframework.http.MediaType;
@@ -59,6 +56,15 @@ public class ServiceRequestController {
     @PutMapping("/{requestId}/start")
     public ServiceRequest startWork(@PathVariable Long requestId) {
         return serviceRequestService.startWork(requestId);
+    }
+    @PutMapping("/{requestId}/arrived")
+    public ServiceRequest markArrived(@PathVariable Long requestId) {
+        return serviceRequestService.markArrived(requestId);
+    }
+
+    @PutMapping("/{requestId}/start-repair")
+    public ServiceRequest startRepair(@PathVariable Long requestId) {
+        return serviceRequestService.startRepair(requestId);
     }
     @PutMapping("/{requestId}/complete")
     public ServiceRequest completeWork(@PathVariable Long requestId) {
@@ -122,5 +128,11 @@ public class ServiceRequestController {
             @PathVariable Long requestId
     ) {
         return serviceRequestService.getMechanicRequestDetails(requestId);
+    }
+    @GetMapping("/{requestId}/tracking")
+    public LiveTrackingResponse getLiveTracking(
+            @PathVariable Long requestId
+    ) {
+        return serviceRequestService.getLiveTracking(requestId);
     }
 }

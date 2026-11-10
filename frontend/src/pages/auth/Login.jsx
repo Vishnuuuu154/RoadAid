@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { Mail, ShieldCheck, MapPin, Clock, ArrowRight, Loader2 } from "lucide-react";
 import "./../../styles/auth.css";
 import { login, saveUser } from "../../services/authService";
+import AuthLayout from "./components/AuthLayout";
+import FormField from "./components/FormField";
+import PasswordInput from "./components/PasswordInput";
+import StatusMessage from "./components/StatusMessage";
+
 function Login() {
 
     const navigate = useNavigate();
@@ -11,7 +17,10 @@ function Login() {
         password: ""
     });
 
+    const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
 
     const handleChange = (e) => {
 
@@ -26,7 +35,10 @@ function Login() {
 
         e.preventDefault();
 
+        if (isSubmitting) return;
+
         setError("");
+        setIsSubmitting(true);
 
         try {
 
@@ -42,6 +54,8 @@ function Login() {
             } else if (response.data.role === "MECHANIC") {
 
                 navigate("/mechanic");
+            } else if (response.data.role === "TOWING_PROVIDER") {
+                navigate("/towing/dashboard");
 
 
             } else {
@@ -63,100 +77,104 @@ function Login() {
 
             }
 
+            setIsSubmitting(false);
+
         }
 
     };
 
     return (
 
-        <div className="login-page">
+        <AuthLayout
+            eyebrow="RoadAid"
+            headline="Help is never far away."
+            subheadline="Sign in to connect with reliable roadside assistance whenever you need it, wherever the road takes you."
+            trustItems={[
+                { icon: <Clock size={15} strokeWidth={1.8} />, label: "Average response under 20 minutes" },
+                { icon: <MapPin size={15} strokeWidth={1.8} />, label: "Verified mechanics near you" },
+                { icon: <ShieldCheck size={15} strokeWidth={1.8} />, label: "Every provider background checked" },
+            ]}
+        >
 
-            <div className="card shadow-lg login-card">
+            <div className="auth-form-header">
+                <h2 className="auth-form-title">Welcome back</h2>
+                <p className="auth-form-subtitle">Sign in to your RoadAid account to continue.</p>
+            </div>
 
-                <div className="card-body p-5">
+            <StatusMessage type="error">{error}</StatusMessage>
 
-                    <div className="text-center mb-4">
+            <form onSubmit={handleSubmit} noValidate>
 
-                        <div className="logo">
-                            🚗
-                        </div>
+                <FormField
+                    label="Email"
+                    icon={Mail}
+                    type="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                />
 
-                        <h2 className="login-title">
-                            RoadAid
-                        </h2>
+                <PasswordInput
+                    label="Password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                />
 
-                        <p className="subtitle">
-                            Roadside Assistance Platform
-                        </p>
+                <div className="auth-form-row">
 
-                    </div>
+                    <label className="checkbox-field">
+                        <input
+                            type="checkbox"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                        />
+                        <span>Remember me</span>
+                    </label>
 
-                    <form onSubmit={handleSubmit}>
-
-                        <div className="mb-3">
-
-                            <label className="form-label">
-                                Email
-                            </label>
-
-                            <input
-                                type="email"
-                                name="email"
-                                className="form-control"
-                                placeholder="Enter your email"
-                                value={formData.email}
-                                onChange={handleChange}
-                            />
-
-                        </div>
-
-                        <div className="mb-3">
-
-                            <label className="form-label">
-                                Password
-                            </label>
-
-                            <input
-                                type="password"
-                                name="password"
-                                className="form-control"
-                                placeholder="Enter your password"
-                                value={formData.password}
-                                onChange={handleChange}
-                            />
-
-                        </div>
-
-                        {error && (
-                            <div className="alert alert-danger">
-                                {error}
-                            </div>
-                        )}
-
-                        <button
-                            type="submit"
-                            className="btn btn-primary w-100"
-                        >
-                            Login
-                        </button>
-
-                    </form>
-
-                    <p className="text-center mt-4">
-
-                        New user?{" "}
-
-                        <Link to="/register">
-                            Register
-                        </Link>
-
-                    </p>
+                    <Link
+                        to="/forgot-password"
+                        className="link-button"
+                    >
+                        Forgot password?
+                    </Link>
 
                 </div>
 
-            </div>
 
-        </div>
+
+                <button
+                    type="submit"
+                    className="btn-primary"
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting ? (
+                        <>
+                            <Loader2 size={17} className="spin" />
+                            Signing in…
+                        </>
+                    ) : (
+                        <>
+                            Sign in
+                            <ArrowRight size={17} strokeWidth={2} />
+                        </>
+                    )}
+                </button>
+
+            </form>
+
+            <p className="auth-form-footer">
+                New to RoadAid?{" "}
+                <Link to="/register">Create an account</Link>
+            </p>
+
+        </AuthLayout>
 
     );
 

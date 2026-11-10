@@ -1,0 +1,221 @@
+/* ==========================================================================
+   RoadAid - Customer layout (top bar, page frame)
+   Save as src/styles/customer-layout.css
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap');
+
+.cl-shell {
+    --cl-ink: #000;
+    --cl-muted: #5b5b5b;
+    --cl-line: #e6e6e6;
+    --cl-canvas: #f5f5f5;
+    --cl-brand: #ff7a29;
+    --cl-red: #b3261e;
+    --cl-red-soft: #fdeceb;
+    --cl-focus: #1d5bbf;
+    --cl-font: 'Figtree', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    min-height: 100vh;
+    background: var(--cl-canvas);
+    color: var(--cl-ink);
+    font-family: var(--cl-font);
+    -webkit-font-smoothing: antialiased;
+}
+
+.cl-shell *, .cl-shell *::before, .cl-shell *::after { box-sizing: border-box; }
+.cl-shell button, .cl-shell input, .cl-shell textarea, .cl-shell select { font-family: inherit; }
+
+/* Applies the new font to the sidebar and pages even where they set their own inline font. */
+.cl-body > * { font-family: var(--cl-font) !important; }
+
+.cl-shell :focus-visible { outline: 3px solid var(--cl-focus); outline-offset: 2px; }
+
+.cl-sr {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.cl-skip {
+    position: absolute;
+    top: -64px;
+    left: 12px;
+    z-index: 200;
+    padding: 12px 20px;
+    border-radius: 999px;
+    background: #000;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.cl-skip:focus { top: 8px; }
+
+/* ---------- Top bar (kept at 60px so the sidebar offset still lines up) ---------- */
+
+.cl-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    padding: 0 20px;
+    background: #fff;
+    border-bottom: 1px solid var(--cl-line);
+}
+
+.cl-side-group { display: flex; align-items: center; gap: 12px; }
+
+.cl-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+}
+
+.cl-brand-mark {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--cl-brand);
+}
+
+.cl-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--cl-ink);
+    cursor: pointer;
+    transition: background-color .15s;
+}
+
+.cl-icon-btn:hover { background: #f0f0f0; }
+.cl-menu-trigger { display: none; }
+
+/* ---------- Account menu ---------- */
+
+.cl-user-wrap { position: relative; }
+
+.cl-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 4px 14px 4px 4px;
+    border: 1px solid var(--cl-line);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--cl-ink);
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .15s;
+}
+
+.cl-user:hover { background: #f5f5f5; }
+
+.cl-avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #000;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.cl-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cl-chevron { color: var(--cl-muted); transition: transform .15s; }
+.cl-chevron.open { transform: rotate(180deg); }
+
+.cl-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 60;
+    min-width: 250px;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid var(--cl-line);
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .14);
+}
+
+.cl-menu-head {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 6px;
+    padding: 10px 12px 12px;
+    border-bottom: 1px solid var(--cl-line);
+    overflow-wrap: anywhere;
+}
+
+.cl-menu-head span { color: var(--cl-muted); font-size: 13.5px; }
+
+.cl-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 46px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--cl-ink);
+    font: 600 15px var(--cl-font);
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.cl-menu-item:hover { background: #f3f3f3; }
+.cl-menu-item.danger { color: var(--cl-red); }
+.cl-menu-item.danger:hover { background: var(--cl-red-soft); }
+
+/* ---------- Page frame ---------- */
+
+.cl-body { display: flex; align-items: stretch; width: 100%; min-width: 0; }
+
+.cl-main {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: calc(100vh - 60px);
+    padding: 28px 28px 40px;
+    overflow-x: hidden;
+    background: var(--cl-canvas);
+}
+
+.cl-main:focus { outline: none; }
+.cl-content { width: 100%; max-width: 1440px; margin: 0 auto; }
+
+@media (max-width: 900px) {
+    .cl-menu-trigger { display: inline-flex; }
+    .cl-user-name { display: none; }
+    .cl-user { padding-right: 12px; }
+    .cl-main { padding: 20px 16px 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cl-shell *, .cl-shell *::before, .cl-shell *::after {
+        transition-duration: .001ms !important;
+        animation-duration: .001ms !important;
+    }
+}

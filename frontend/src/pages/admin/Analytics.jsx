@@ -1,253 +1,148 @@
+import { Link } from "react-router-dom";
 import AdminLayout from "../../layouts/AdminLayout";
-import { getAnalytics } from "../../services/adminService";
-import { useEffect, useState } from "react";
+
 import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    ArcElement,
-    Tooltip,
-    Legend
-} from "chart.js";
+    FaChartLine,
+    FaClipboardList,
+    FaRupeeSign,
+    FaTools,
+    FaUsers,
+    FaUser,
+    FaStar,
+    FaMapMarkerAlt,
+    FaFileExport,
+    FaArrowRight
+} from "react-icons/fa";
 
-import { Bar, Doughnut,Pie } from "react-chartjs-2";
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    ArcElement,
-    Tooltip,
-    Legend
-);
+import "../../styles/AdminAnalytics.css";
+
+/* ================================================================== */
+/* Config                                                              */
+/* ================================================================== */
+
+/* Same pages and paths as before, now grouped by what they help you decide. */
+const OVERVIEW = {
+    title: "Overview",
+    description: "Key numbers and how this month compares with last month.",
+    Icon: FaChartLine,
+    path: "/admin/analytics/overview"
+};
+
+const SECTIONS = [
+    {
+        title: "Business",
+        items: [
+            {
+                title: "Revenue",
+                description: "Earnings, payments and transactions over time.",
+                Icon: FaRupeeSign,
+                path: "/admin/analytics/revenue"
+            },
+            {
+                title: "Reports & export",
+                description: "Pick a date range and download a report.",
+                Icon: FaFileExport,
+                path: "/admin/analytics/reports"
+            }
+        ]
+    },
+    {
+        title: "Operations",
+        items: [
+            {
+                title: "Requests",
+                description: "Trends, status, completions and cancellations.",
+                Icon: FaClipboardList,
+                path: "/admin/analytics/requests"
+            },
+            {
+                title: "Services",
+                description: "Which problems customers ask for help with most.",
+                Icon: FaTools,
+                path: "/admin/analytics/services"
+            },
+            {
+                title: "Locations",
+                description: "Hotspots and areas with the highest demand.",
+                Icon: FaMapMarkerAlt,
+                path: "/admin/analytics/location"
+            }
+        ]
+    },
+    {
+        title: "People",
+        items: [
+            {
+                title: "Providers",
+                description: "Mechanic availability, ratings and completed jobs.",
+                Icon: FaUsers,
+                path: "/admin/analytics/providers"
+            },
+            {
+                title: "Customers",
+                description: "Sign-ups, activity and repeat usage.",
+                Icon: FaUser,
+                path: "/admin/analytics/customers"
+            },
+            {
+                title: "Reviews & complaints",
+                description: "Ratings, open complaints and customer feedback.",
+                Icon: FaStar,
+                path: "/admin/analytics/reviews"
+            }
+        ]
+    }
+];
+
+/* ================================================================== */
+/* Page                                                                */
+/* ================================================================== */
+
 function Analytics() {
-    const [analytics, setAnalytics] = useState({
-        totalCustomers: 0,
-        totalMechanics: 0,
-        totalRequests: 0,
-        pendingRequests: 0,
-        completedRequests: 0,
-        cancelledRequests: 0,
-        totalComplaints: 0,
-        totalPayments: 0
-    });
-    useEffect(() => {
-        loadAnalytics();
-    }, []);
+    const HeroIcon = OVERVIEW.Icon;
 
-    const loadAnalytics = async () => {
-
-        try {
-
-            const response = await getAnalytics();
-
-            setAnalytics(response.data);
-
-        } catch (error) {
-
-            console.error(error);
-
-        }
-
-    };
-    const requestChart = {
-
-        labels: ["Pending", "Completed", "Cancelled"],
-
-        datasets: [
-
-            {
-
-                label: "Requests",
-
-                data: [
-                    analytics.pendingRequests,
-                    analytics.completedRequests,
-                    analytics.cancelledRequests
-                ],
-
-                backgroundColor: [
-                    "#ffc107",
-                    "#198754",
-                    "#dc3545"
-                ],
-
-                borderRadius: 8
-
-            }
-
-        ]
-
-    };
-    const userChart = {
-
-        labels: ["Customers", "Mechanics"],
-
-        datasets: [
-
-            {
-
-                data: [
-
-                    analytics.totalCustomers,
-                    analytics.totalMechanics
-
-                ],
-
-                backgroundColor: [
-
-                    "#0d6efd",
-                    "#198754"
-
-                ]
-
-            }
-
-        ]
-
-    };
-    const complaintChart = {
-
-        labels: ["Complaints", "No Complaints"],
-
-        datasets: [
-
-            {
-
-                data: [
-
-                    analytics.totalComplaints,
-                    Math.max(
-                        analytics.totalRequests - analytics.totalComplaints,
-                        0
-                    )
-
-                ],
-
-                backgroundColor: [
-
-                    "#dc3545",
-                    "#198754"
-
-                ]
-
-            }
-
-        ]
-
-    };
     return (
-
         <AdminLayout>
+            <div className="an-root">
+                <header className="an-header">
+                    <h1 className="an-title">Analytics</h1>
+                    <p className="an-sub">See how RoadAid is doing and where to look next.</p>
+                </header>
 
-            <h2 className="mb-4">
-                Analytics Dashboard
-            </h2>
+                <Link to={OVERVIEW.path} className="an-hero">
+                    <span className="an-hero-icon" aria-hidden="true"><HeroIcon /></span>
+                    <span className="an-hero-text">
+                        <strong>{OVERVIEW.title}</strong>
+                        <span>{OVERVIEW.description}</span>
+                    </span>
+                    <span className="an-hero-go">
+                        Open <FaArrowRight aria-hidden="true" />
+                    </span>
+                </Link>
 
-            <div className="row">
+                {SECTIONS.map((section) => (
+                    <section key={section.title} className="an-section" aria-labelledby={`an-${section.title}`}>
+                        <h2 id={`an-${section.title}`} className="an-section-title">{section.title}</h2>
 
-                <div className="col-lg-8 mb-4">
+                        <div className="an-grid">
+                            {section.items.map(({ title, description, Icon, path }) => (
+                                <Link key={path} to={path} className="an-card">
+                                    <span className="an-card-icon" aria-hidden="true"><Icon /></span>
 
-                    <div className="card shadow-sm">
+                                    <span className="an-card-text">
+                                        <strong>{title}</strong>
+                                        <span>{description}</span>
+                                    </span>
 
-                        <div className="card-body">
-
-                            <h5 className="card-title">
-                                Request Status
-
-                            </h5>
-                            <Bar data={requestChart} />
-
+                                    <FaArrowRight className="an-card-go" aria-hidden="true" />
+                                </Link>
+                            ))}
                         </div>
-
-                    </div>
-
-                </div>
-
-                <div className="col-lg-4 mb-4">
-
-                    <div className="card shadow-sm">
-
-                        <div className="card-body">
-
-                            <h5 className="card-title">
-                                User Distribution
-                            </h5>
-                            <Doughnut data={userChart} />
-                        </div>
-
-                    </div>
-
-                </div>
-
+                    </section>
+                ))}
             </div>
-
-            <div className="row">
-
-                <div className="col-lg-6">
-
-                    <div className="card shadow-sm">
-
-                        <div className="card-body">
-
-                            <h5 className="card-title">
-                                Complaint Statistics
-                            </h5>
-
-                            <Pie data={complaintChart} />
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div className="col-lg-6">
-
-                    <div className="card shadow-sm">
-
-                        <div className="card-body">
-
-                            <h5 className="card-title">
-                                Payment Summary
-                            </h5>
-
-                            <div className="mt-4">
-
-                                <h2 className="fw-bold text-primary">
-                                    {analytics.totalPayments}
-                                </h2>
-
-                                <p className="text-muted mb-3">
-                                    Total Payments Processed
-                                </p>
-
-                                <hr />
-
-                                <div className="d-flex justify-content-between">
-
-                                    <span>Payment Module</span>
-
-                                    <span className="badge bg-success">
-                            Active
-                        </span>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
         </AdminLayout>
-
     );
-
 }
 
 export default Analytics;

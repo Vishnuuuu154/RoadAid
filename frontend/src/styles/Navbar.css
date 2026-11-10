@@ -1,0 +1,255 @@
+/* ==========================================================================
+   Navbar — same design tokens as the rest of the app (Requests,
+   RequestDetails, MechanicLayout) so every screen reads as one product.
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap");
+
+.navbar {
+    --ink: #1b1e24;
+    --ink-soft: #5b6270;
+    --ink-faint: #8b909c;
+
+    --surface: #ffffff;
+    --border: #e4e6eb;
+    --border-strong: #d3d6dc;
+    --hover: #f4f5f7;
+
+    --accent: #e2661f;
+    --accent-dark: #b14e16;
+
+    --danger: #c23b31;
+    --danger-soft: #fdebeb;
+
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    padding: 0 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+
+.navbar * {
+    box-sizing: border-box;
+}
+
+.navbar button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Left: menu trigger + brand                                             */
+/* ---------------------------------------------------------------------- */
+
+.navbar__left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.navbar__menu-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navbar__menu-btn:hover {
+    background: var(--hover);
+    color: var(--ink);
+}
+
+@media (max-width: 900px) {
+    .navbar__menu-btn {
+        display: inline-flex;
+    }
+}
+
+.navbar__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.navbar__mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(155deg, #f0813a 0%, var(--accent) 55%, var(--accent-dark) 100%);
+    box-shadow: 0 4px 10px rgba(226, 102, 31, 0.32);
+    flex-shrink: 0;
+}
+
+.navbar__name {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: 15.5px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Right: user menu                                                       */
+/* ---------------------------------------------------------------------- */
+
+.navbar__right {
+    position: relative;
+}
+
+.navbar__user-btn {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid var(--border);
+    background: transparent;
+    border-radius: 999px;
+    padding: 5px 12px 5px 5px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.navbar__user-btn:hover {
+    background: var(--hover);
+    border-color: var(--border-strong);
+}
+
+.navbar__user-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+@media (max-width: 900px) {
+    .navbar__user-name {
+        display: none;
+    }
+}
+
+.navbar__chevron {
+    width: 11px;
+    height: 11px;
+    color: var(--ink-faint);
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+}
+
+.navbar__user-btn[aria-expanded="true"] .navbar__chevron {
+    transform: rotate(180deg);
+}
+
+.navbar__avatar {
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: linear-gradient(155deg, #f0813a 0%, var(--accent) 55%, var(--accent-dark) 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-family: "Space Grotesk", sans-serif;
+}
+
+.navbar__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Dropdown                                                                */
+/* ---------------------------------------------------------------------- */
+
+.navbar__scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+}
+
+.navbar__dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    min-width: 200px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 6px;
+    z-index: 11;
+    box-shadow: 0 16px 36px rgba(27, 30, 36, 0.14);
+    animation: navbar-dropdown-in 0.12s ease;
+}
+
+@keyframes navbar-dropdown-in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.navbar__dropdown-header {
+    padding: 9px 10px 11px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+}
+
+.navbar__dropdown-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.navbar__dropdown-email {
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-top: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.navbar__dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: var(--danger);
+    padding: 9px 10px;
+    border-radius: 7px;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s ease;
+}
+
+.navbar__dropdown-item:hover {
+    background: var(--danger-soft);
+}
+
+.navbar__dropdown-item svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+}

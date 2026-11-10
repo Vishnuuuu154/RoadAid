@@ -106,4 +106,8 @@ public class ReviewService {
 
         return average != null ? average : 0.0;
     }
+    public List<Review> getAllReviews() {
+
+        return reviewRepository.findAll();
+    }
 }

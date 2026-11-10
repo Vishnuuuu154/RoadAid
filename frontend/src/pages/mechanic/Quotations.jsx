@@ -1,985 +1,696 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MechanicLayout from "../../layouts/MechanicLayout";
+import MechanicLayout, { useToast } from "../../layouts/MechanicLayout";
+import { getMyQuotations, updateQuotation } from "../../services/mechanicService";
+import "../../styles/Quotations.css";
+
 import {
-    getMyQuotations,
-    updateQuotation
-} from "../../services/mechanicService";
+    FaSyncAlt,
+    FaExclamationTriangle,
+    FaFileInvoiceDollar,
+    FaPen,
+    FaEye,
+    FaCheckCircle,
+    FaHourglassHalf,
+    FaTimesCircle,
+    FaBan,
+    FaCarSide,
+    FaTimes,
+    FaSearch,
+    FaSlidersH,
+    FaListUl,
+    FaInfoCircle,
+    FaWifi
+} from "react-icons/fa";
 
+/* ================================================================== */
+/* Config + helpers                                                    */
+/* ================================================================== */
 
-function Quotations() {
+const POLL_MS = 30000;
 
+const GROUPS = [
+    { key: "awaiting", label: "Awaiting customer" },
+    { key: "accepted", label: "Accepted" },
+    { key: "done", label: "Completed" },
+    { key: "closed", label: "Closed" }
+];
+
+const SORTS = [
+    { key: "awaiting", label: "Awaiting customer first" },
+    { key: "newest", label: "Newest first" },
+    { key: "oldest", label: "Oldest first" },
+    { key: "high", label: "Highest amount" },
+    { key: "low", label: "Lowest amount" }
+];
+
+const GROUP_ORDER = { awaiting: 0, accepted: 1, done: 2, closed: 3 };
+
+const REQUEST_STATUS_LABELS = {
+    PENDING: "Pending",
+    WAITING_FOR_QUOTATION: "Waiting for quotation",
+    QUOTATION_PENDING: "Quotation sent",
+    ACCEPTED: "Accepted",
+    IN_PROGRESS: "In progress",
+    COMPLETED: "Completed",
+    REJECTED: "Rejected",
+    CANCELLED: "Cancelled"
+};
+
+const CHARGES = [
+    { name: "labourCharge", label: "Labour", seg: "qt-seg-labour" },
+    { name: "partsCharge", label: "Parts", seg: "qt-seg-parts" },
+    { name: "travelFee", label: "Travel fee", seg: "qt-seg-travel" }
+];
+
+const money = (n) =>
+    new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(n || 0);
+
+const moneyCompact = (n) =>
+    new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n || 0);
+
+const initials = (name) =>
+    (name || "C").trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("") || "C";
+
+const idValue = (q) => (Number.isNaN(Number(q.id)) ? 0 : Number(q.id));
+
+// One place decides how a quotation is described, so the badge and the filters always agree.
+function getDisplayStatus(q) {
+    const requestStatus = q.serviceRequest?.status;
+
+    const paymentStatus = String(q.paymentStatus || "").toUpperCase();
+
+    if (requestStatus === "CANCELLED") return { key: "closed", label: "Request cancelled", tone: "neutral", icon: FaBan };
+    if (requestStatus === "REJECTED") return { key: "closed", label: "Request rejected", tone: "danger", icon: FaTimesCircle };
+
+    // A paid quote is finished work, even if the request hasn't been marked completed yet.
+    if (PAID_STATES.includes(paymentStatus)) return { key: "done", label: "Paid", tone: "success", icon: FaCheckCircle };
+    if (requestStatus === "COMPLETED") return { key: "done", label: "Completed", tone: "success", icon: FaCheckCircle };
+
+    if (paymentStatus === "ACCEPTED") return { key: "accepted", label: "Accepted", tone: "success", icon: FaCheckCircle };
+    if (paymentStatus === "PENDING") return { key: "awaiting", label: "Awaiting customer", tone: "warning", icon: FaHourglassHalf };
+    if (paymentStatus === "REJECTED") return { key: "closed", label: "Rejected", tone: "danger", icon: FaTimesCircle };
+
+    // Anything we don't recognise still lands in Closed, but is flagged so it can be spotted.
+    return { key: "closed", label: paymentStatus || "Unknown", tone: "neutral", icon: FaBan, unknown: true };
+}
+
+// Payment values that mean the customer has paid. Add yours here if it uses another word.
+const PAID_STATES = ["PAID", "SUCCESS", "COMPLETED", "CASH_PAID"];
+
+const emptyForm = { labourCharge: "", partsCharge: "", travelFee: "" };
+
+/* ================================================================== */
+/* Quotation card                                                      */
+/* ================================================================== */
+
+function QuotationCard({ q, onEdit, onView }) {
+    const request = q.serviceRequest;
+    const status = getDisplayStatus(q);
+    const Icon = status.icon;
+    const vehicle = [request?.vehicle?.brand, request?.vehicle?.model].filter(Boolean).join(" ");
+    const canEdit = q.paymentStatus === "PENDING" && request?.status === "QUOTATION_PENDING";
+    const customer = request?.customer?.fullName || "Customer";
+
+    const parts = CHARGES.map((c) => ({ ...c, value: Number(q[c.name]) || 0 }));
+    const sum = parts.reduce((s, p) => s + p.value, 0);
+
+    return (
+        <article className="qt-card" data-status={status.key}>
+            <div className="qt-card-top">
+                <span className="qt-badge" data-tone={status.tone}>
+                    <Icon aria-hidden="true" /> {status.label}
+                </span>
+                <span className="qt-req-id">Request #{request?.id || "—"}</span>
+            </div>
+
+            <div className="qt-who">
+                <span className="qt-avatar" aria-hidden="true">{initials(customer)}</span>
+                <div>
+                    <h2 className="qt-name">{customer}</h2>
+                    {vehicle && (
+                        <p className="qt-vehicle">
+                            <FaCarSide aria-hidden="true" /> {vehicle}
+                        </p>
+                    )}
+                </div>
+            </div>
+
+            <div className="qt-total-box">
+                <div className="qt-total-row">
+                    <span className="qt-total-label">Total quoted</span>
+                    <span className="qt-total-value">{money(Number(q.totalAmount))}</span>
+                </div>
+
+                {sum > 0 && (
+                    <div className="qt-bar" aria-hidden="true">
+                        {parts.filter((p) => p.value > 0).map((p) => (
+                            <i key={p.name} className={p.seg} style={{ width: `${(p.value / sum) * 100}%` }} />
+                        ))}
+                    </div>
+                )}
+
+                <dl className="qt-lines">
+                    {parts.map((p) => (
+                        <div className="qt-line" key={p.name}>
+                            <dt><span className={`qt-dot ${p.seg}`} aria-hidden="true" /> {p.label}</dt>
+                            <dd>{money(p.value)}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+
+            <p className="qt-meta">
+                Request status: <strong>{REQUEST_STATUS_LABELS[request?.status] || request?.status || "Unknown"}</strong>
+            </p>
+
+            <div className="qt-actions">
+                {canEdit && (
+                    <button type="button" className="qt-btn qt-btn-dark" onClick={() => onEdit(q)}>
+                        <FaPen aria-hidden="true" /> Edit quotation
+                    </button>
+                )}
+                {request?.id && (
+                    <button type="button" className="qt-btn" onClick={() => onView(request.id)}>
+                        <FaEye aria-hidden="true" /> View request
+                    </button>
+                )}
+            </div>
+
+            {canEdit && (
+                <p className="qt-hint">
+                    <FaInfoCircle aria-hidden="true" /> You can edit this until the customer accepts it.
+                </p>
+            )}
+        </article>
+    );
+}
+
+/* ================================================================== */
+/* Page                                                                */
+/* ================================================================== */
+
+function QuotationsContent() {
     const navigate = useNavigate();
+    const showToast = useToast();
 
     const [quotations, setQuotations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState("");
+    const [syncFailed, setSyncFailed] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState(null);
 
-    const [editingQuotation, setEditingQuotation] = useState(null);
+    const [groups, setGroups] = useState([]); // selected groups; empty = all
+    const [sort, setSort] = useState("awaiting");
+    const [query, setQuery] = useState("");
+    const [panelOpen, setPanelOpen] = useState(false);
 
-    const [editForm, setEditForm] = useState({
-        labourCharge: "",
-        partsCharge: "",
-        travelFee: ""
-    });
-
+    const [editing, setEditing] = useState(null);
+    const [form, setForm] = useState(emptyForm);
     const [saving, setSaving] = useState(false);
     const [editError, setEditError] = useState("");
 
+    const searchRef = useRef(null);
+    const toolbarRef = useRef(null);
 
-    /* =========================================
-       LOAD QUOTATIONS
-    ========================================= */
+    /* ---------------------------- data ---------------------------- */
 
-    useEffect(() => {
-        loadQuotations();
-    }, []);
-
-
-    const loadQuotations = async () => {
-
+    const load = useCallback(async (silent = false) => {
         try {
-
-            setLoading(true);
+            if (!silent) setError("");
+            const response = await getMyQuotations();
+            setQuotations(Array.isArray(response.data) ? response.data : []);
+            setLastUpdated(new Date());
+            setSyncFailed(false);
             setError("");
-
-            const response =
-                await getMyQuotations();
-
-            setQuotations(response.data);
-
-        } catch (error) {
-
-            console.error(
-                "Failed to load quotations:",
-                error
-            );
-
-            setError(
-                error.response?.data?.message ||
-                "Failed to load quotations."
-            );
-
+        } catch (err) {
+            console.error("Failed to load quotations:", err);
+            if (silent) setSyncFailed(true);
+            else setError(err.response?.data?.message || "Failed to load quotations.");
         } finally {
-
             setLoading(false);
             setRefreshing(false);
-
         }
+    }, []);
 
-    };
+    useEffect(() => {
+        load();
+        // Quietly pick up a customer accepting or rejecting a quote.
+        const id = setInterval(() => !document.hidden && load(true), POLL_MS);
+        return () => clearInterval(id);
+    }, [load]);
 
-
-    /* =========================================
-       REFRESH
-    ========================================= */
-
-    const handleRefresh = async () => {
-
+    const handleRefresh = () => {
         setRefreshing(true);
-
-        await loadQuotations();
-
+        load();
     };
 
+    /* ---------- keyboard + outside click ---------- */
 
-    /* =========================================
-       STATUS BADGE
-    ========================================= */
-
-    const getStatusBadge = (status) => {
-
-        switch (status) {
-
-            case "PENDING":
-
-                return (
-                    <span className="badge bg-warning text-dark">
-                        ⏳ Awaiting Customer
-                    </span>
-                );
-
-            case "ACCEPTED":
-
-                return (
-                    <span className="badge bg-success">
-                        ✓ Accepted
-                    </span>
-                );
-
-            case "PAID":
-
-                return (
-                    <span className="badge bg-success">
-                        💳 Paid
-                    </span>
-                );
-
-            case "REJECTED":
-
-                return (
-                    <span className="badge bg-danger">
-                        ✕ Rejected
-                    </span>
-                );
-
-            default:
-
-                return (
-                    <span className="badge bg-secondary">
-                        {status || "Unknown"}
-                    </span>
-                );
-
-        }
-
-    };
-    const getQuotationDisplayStatus = (quotation) => {
-
-        const requestStatus =
-            quotation.serviceRequest?.status;
-
-        if (requestStatus === "CANCELLED") {
-
-            return (
-                <span className="badge bg-secondary">
-                ✕ Request Cancelled
-            </span>
-            );
-
-        }
-
-        if (requestStatus === "COMPLETED") {
-
-            if (quotation.paymentStatus === "PAID") {
-                return (
-                    <span className="badge bg-success">
-                    💳 Paid
-                </span>
-                );
+    useEffect(() => {
+        const onKey = (e) => {
+            if (e.key === "Escape") setPanelOpen(false);
+            const tag = document.activeElement?.tagName;
+            if (e.key === "/" && !editing && tag !== "INPUT" && tag !== "TEXTAREA" && tag !== "SELECT") {
+                e.preventDefault();
+                searchRef.current?.focus();
             }
+        };
+        const onClick = (e) => {
+            if (window.innerWidth > 760 && toolbarRef.current && !toolbarRef.current.contains(e.target)) {
+                setPanelOpen(false);
+            }
+        };
+        document.addEventListener("keydown", onKey);
+        document.addEventListener("mousedown", onClick);
+        return () => {
+            document.removeEventListener("keydown", onKey);
+            document.removeEventListener("mousedown", onClick);
+        };
+    }, [editing]);
 
-            return (
-                <span className="badge bg-success">
-                ✓ Completed
-            </span>
+    /* ---------- derived ---------- */
+
+    const stats = useMemo(() => {
+        const out = { all: { count: 0, value: 0 } };
+        GROUPS.forEach((g) => (out[g.key] = { count: 0, value: 0 }));
+        quotations.forEach((q) => {
+            const key = getDisplayStatus(q).key;
+            const amount = Number(q.totalAmount) || 0;
+            out[key].count += 1;
+            out[key].value += amount;
+            out.all.count += 1;
+            // Rejected and cancelled quotes aren't money you can earn, so keep them out of the headline value.
+            if (key !== "closed") out.all.value += amount;
+        });
+        return out;
+    }, [quotations]);
+
+    // Helps spot quotes whose status this page doesn't know how to group.
+    useEffect(() => {
+        const odd = quotations.filter((q) => getDisplayStatus(q).unknown);
+        if (odd.length > 0) {
+            console.warn(
+                `${odd.length} quotation(s) have a status the page doesn't recognise:`,
+                odd.map((q) => ({ id: q.id, paymentStatus: q.paymentStatus, requestStatus: q.serviceRequest?.status }))
             );
-
         }
+    }, [quotations]);
 
-        if (quotation.paymentStatus === "ACCEPTED") {
+    const visible = useMemo(() => {
+        const text = query.trim().toLowerCase();
+        const list = quotations
+            .filter((q) => groups.length === 0 || groups.includes(getDisplayStatus(q).key))
+            .filter((q) => {
+                if (!text) return true;
+                const r = q.serviceRequest;
+                return [r?.id, r?.customer?.fullName, r?.vehicle?.brand, r?.vehicle?.model]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase()
+                    .includes(text);
+            });
 
-            return (
-                <span className="badge bg-success">
-                ✓ Accepted
-            </span>
-            );
+        const newest = (a, b) => idValue(b) - idValue(a);
+        const amount = (q) => Number(q.totalAmount) || 0;
 
+        switch (sort) {
+            case "oldest": return list.sort((a, b) => -newest(a, b));
+            case "high": return list.sort((a, b) => amount(b) - amount(a));
+            case "low": return list.sort((a, b) => amount(a) - amount(b));
+            case "awaiting":
+                return list.sort((a, b) => GROUP_ORDER[getDisplayStatus(a).key] - GROUP_ORDER[getDisplayStatus(b).key] || newest(a, b));
+            default: return list.sort(newest);
         }
+    }, [quotations, groups, query, sort]);
 
-        if (quotation.paymentStatus === "PENDING") {
+    const isFiltered = groups.length > 0 || query.trim() !== "";
+    const filterCount = groups.length + (sort !== "awaiting" ? 1 : 0);
 
-            return (
-                <span className="badge bg-warning text-dark">
-                ⏳ Awaiting Customer
-            </span>
-            );
-
-        }
-
-        if (quotation.paymentStatus === "REJECTED") {
-
-            return (
-                <span className="badge bg-danger">
-                ✕ Rejected
-            </span>
-            );
-
-        }
-
-        return (
-            <span className="badge bg-secondary">
-            {quotation.paymentStatus || "Unknown"}
-        </span>
-        );
-
+    const toggleGroup = (key) => setGroups((prev) => (prev.includes(key) ? prev.filter((g) => g !== key) : [...prev, key]));
+    const clearAll = () => {
+        setGroups([]);
+        setQuery("");
+        setSort("awaiting");
     };
 
+    const summaryCards = [
+        { key: "all", label: "All quotes", tone: "neutral", icon: FaListUl, groups: [] },
+        { key: "awaiting", label: "Awaiting customer", tone: "warning", icon: FaHourglassHalf, groups: ["awaiting"] },
+        { key: "accepted", label: "Accepted", tone: "success", icon: FaCheckCircle, groups: ["accepted"] },
+        { key: "done", label: "Completed", tone: "info", icon: FaFileInvoiceDollar, groups: ["done"] }
+    ];
 
-    /* =========================================
-       OPEN EDIT MODAL
-    ========================================= */
+    const cardActive = (card) => card.groups.length === groups.length && card.groups.every((g) => groups.includes(g));
 
-    const handleEdit = (quotation) => {
+    /* ---------------------------- editing ---------------------------- */
 
-        setEditingQuotation(quotation);
-
-        setEditForm({
-            labourCharge:
-                quotation.labourCharge ?? "",
-
-            partsCharge:
-                quotation.partsCharge ?? "",
-
-            travelFee:
-                quotation.travelFee ?? ""
-        });
-
+    const closeEdit = useCallback(() => {
+        if (saving) return;
+        setEditing(null);
+        setForm(emptyForm);
         setEditError("");
+    }, [saving]);
 
-    };
+    useEffect(() => {
+        if (!editing) return;
+        const onKey = (e) => e.key === "Escape" && closeEdit();
+        document.addEventListener("keydown", onKey);
+        return () => document.removeEventListener("keydown", onKey);
+    }, [editing, closeEdit]);
 
-
-    /* =========================================
-       CLOSE EDIT MODAL
-    ========================================= */
-
-    const handleCloseEdit = () => {
-
-        if (saving) {
-            return;
-        }
-
-        setEditingQuotation(null);
-
-        setEditForm({
-            labourCharge: "",
-            partsCharge: "",
-            travelFee: ""
+    const openEdit = (q) => {
+        setEditing(q);
+        setForm({
+            labourCharge: q.labourCharge ?? "",
+            partsCharge: q.partsCharge ?? "",
+            travelFee: q.travelFee ?? ""
         });
-
         setEditError("");
-
     };
 
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-    /* =========================================
-       FORM CHANGE
-    ========================================= */
+    const newTotal = Number(form.labourCharge || 0) + Number(form.partsCharge || 0) + Number(form.travelFee || 0);
+    const oldTotal = editing ? Number(editing.totalAmount) || 0 : 0;
+    const diff = newTotal - oldTotal;
+    const unchanged = editing
+        ? CHARGES.every((c) => Number(form[c.name] || 0) === (Number(editing[c.name]) || 0))
+        : true;
 
-    const handleEditChange = (e) => {
-
-        const { name, value } = e.target;
-
-        setEditForm({
-            ...editForm,
-            [name]: value
-        });
-
-    };
-
-
-    /* =========================================
-       EDIT TOTAL
-    ========================================= */
-
-    const editTotal =
-        Number(editForm.labourCharge || 0) +
-        Number(editForm.partsCharge || 0) +
-        Number(editForm.travelFee || 0);
-
-
-    /* =========================================
-       SAVE QUOTATION
-    ========================================= */
-
-    const handleSaveQuotation = async (e) => {
-
+    const handleSave = async (e) => {
         e.preventDefault();
+        if (!editing) return;
 
-        if (!editingQuotation) {
+        const values = [form.labourCharge, form.partsCharge, form.travelFee].map(Number);
+        if (values.some((v) => !Number.isFinite(v) || v < 0)) {
+            setEditError("Please enter valid charges.");
             return;
         }
-
-        const labour =
-            Number(editForm.labourCharge);
-
-        const parts =
-            Number(editForm.partsCharge);
-
-        const travel =
-            Number(editForm.travelFee);
-
-
-        if (
-            !Number.isFinite(labour) ||
-            labour < 0 ||
-            !Number.isFinite(parts) ||
-            parts < 0 ||
-            !Number.isFinite(travel) ||
-            travel < 0
-        ) {
-
-            setEditError(
-                "Please enter valid charges."
-            );
-
-            return;
-
-        }
-
 
         try {
-
             setSaving(true);
             setEditError("");
-
-            await updateQuotation(
-                editingQuotation.serviceRequest.id,
-                {
-                    labourCharge: labour,
-                    partsCharge: parts,
-                    travelFee: travel
-                }
-            );
-
-            alert(
-                "Quotation updated successfully."
-            );
-
-            setEditingQuotation(null);
-
-            await loadQuotations();
-
-        } catch (error) {
-
-            console.error(
-                "Failed to update quotation:",
-                error
-            );
-
-            setEditError(
-                error.response?.data?.message ||
-                "Failed to update quotation."
-            );
-
+            await updateQuotation(editing.serviceRequest.id, {
+                labourCharge: values[0],
+                partsCharge: values[1],
+                travelFee: values[2]
+            });
+            setEditing(null);
+            showToast("Quotation updated. The customer will see the new total.", "success");
+            await load(true);
+        } catch (err) {
+            console.error("Failed to update quotation:", err);
+            setEditError(err.response?.data?.message || "Failed to update quotation.");
         } finally {
-
             setSaving(false);
-
         }
-
     };
 
-
-    /* =========================================
-       LOADING
-    ========================================= */
-
-    if (loading) {
-
-        return (
-
-            <MechanicLayout>
-
-                <div className="card border-0 shadow-sm">
-
-                    <div className="card-body text-center py-5">
-
-                        <div className="spinner-border text-primary mb-3">
-                        </div>
-
-                        <p className="text-muted mb-0">
-                            Loading quotations...
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </MechanicLayout>
-
-        );
-
-    }
-
-
-    /* =========================================
-       PAGE
-    ========================================= */
+    /* ----------------------------- render ---------------------------- */
 
     return (
-
-        <MechanicLayout>
-
-            {/* =========================================
-                HEADER
-            ========================================= */}
-
-            <div className="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
-
+        <div className="qt-root">
+            <header className="qt-header">
                 <div>
-
-                    <h2 className="fw-bold mb-1">
-                        💰 Quotations
-                    </h2>
-
-                    <p className="text-muted mb-0">
-                        View and manage quotations sent to customers.
+                    <h1 className="qt-title">Quotations</h1>
+                    <p className="qt-sub">
+                        <span className="qt-live">
+                            <span className="qt-live-dot" aria-hidden="true" />
+                            {lastUpdated
+                                ? `Live · updated ${lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+                                : "Loading your quotes…"}
+                        </span>
                     </p>
-
                 </div>
+                <button type="button" className="qt-btn" onClick={handleRefresh} disabled={loading || refreshing}>
+                    <FaSyncAlt aria-hidden="true" className={refreshing ? "qt-spin" : ""} />
+                    {refreshing ? "Refreshing…" : "Refresh"}
+                </button>
+            </header>
 
+            {syncFailed && !error && (
+                <div className="qt-banner" role="status">
+                    <FaWifi aria-hidden="true" /> Couldn't refresh just now. Showing your last loaded quotes.
+                </div>
+            )}
+
+            {/* Summary cards double as quick filters */}
+            <section className="qt-stats" aria-label="Quick filters">
+                {summaryCards.map((card) => {
+                    const CardIcon = card.icon;
+                    const s = stats[card.key];
+                    return (
+                        <button
+                            key={card.key}
+                            type="button"
+                            className="qt-stat"
+                            data-tone={card.tone}
+                            aria-pressed={cardActive(card)}
+                            onClick={() => setGroups(card.groups)}
+                        >
+                            <span className="qt-stat-top">
+                                <span className="qt-stat-ico"><CardIcon aria-hidden="true" /></span>
+                                {card.label}
+                            </span>
+                            <span className="qt-stat-value">{loading ? "–" : moneyCompact(s.value)}</span>
+                            <span className="qt-stat-count">
+                                {loading
+                                    ? ""
+                                    : card.key === "all" && stats.closed.count > 0
+                                        ? `${s.count} quote${s.count === 1 ? "" : "s"} · ${stats.closed.count} closed`
+                                        : `${s.count} quote${s.count === 1 ? "" : "s"}`}
+                            </span>
+                        </button>
+                    );
+                })}
+            </section>
+
+            {/* Search + filter */}
+            <div className="qt-toolbar" ref={toolbarRef}>
+                <div className="qt-search">
+                    <FaSearch aria-hidden="true" />
+                    <input
+                        ref={searchRef}
+                        type="search"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Search customer, vehicle or request no."
+                        aria-label="Search quotations"
+                    />
+                    {query ? (
+                        <button type="button" className="qt-search-clear" onClick={() => setQuery("")} aria-label="Clear search">
+                            <FaTimes aria-hidden="true" />
+                        </button>
+                    ) : (
+                        <span className="qt-kbd" aria-hidden="true">/</span>
+                    )}
+                </div>
 
                 <button
-                    className="btn btn-outline-secondary"
-                    onClick={handleRefresh}
-                    disabled={refreshing}
+                    type="button"
+                    className="qt-btn qt-filter-btn"
+                    aria-expanded={panelOpen}
+                    aria-controls="qt-filter-panel"
+                    onClick={() => setPanelOpen((o) => !o)}
                 >
-
-                    🔄{" "}
-
-                    {refreshing
-                        ? "Refreshing..."
-                        : "Refresh"}
-
+                    <FaSlidersH aria-hidden="true" />
+                    <span className="qt-filter-text">Filter &amp; sort</span>
+                    {filterCount > 0 && <span className="qt-filter-badge">{filterCount}</span>}
                 </button>
 
+                {panelOpen && (
+                    <>
+                        <div className="qt-scrim" onClick={() => setPanelOpen(false)} />
+                        <div className="qt-panel" id="qt-filter-panel" role="dialog" aria-label="Filter and sort quotations">
+                            <div className="qt-panel-head">
+                                <h2 className="qt-panel-title">Filter &amp; sort</h2>
+                                <button type="button" className="qt-icon-btn" onClick={() => setPanelOpen(false)} aria-label="Close filters">
+                                    <FaTimes aria-hidden="true" />
+                                </button>
+                            </div>
+
+                            <div className="qt-group">
+                                <span className="qt-group-label">Status</span>
+                                <div className="qt-chips">
+                                    {GROUPS.map((g) => (
+                                        <button
+                                            key={g.key}
+                                            type="button"
+                                            className="qt-chip"
+                                            aria-pressed={groups.includes(g.key)}
+                                            onClick={() => toggleGroup(g.key)}
+                                        >
+                                            {g.label}
+                                            <span className="qt-chip-count">{stats[g.key].count}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="qt-group">
+                                <label className="qt-group-label" htmlFor="qt-sort">Sort by</label>
+                                <select id="qt-sort" className="qt-select" value={sort} onChange={(e) => setSort(e.target.value)}>
+                                    {SORTS.map((s) => (
+                                        <option key={s.key} value={s.key}>{s.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="qt-panel-foot">
+                                <button type="button" className="qt-btn" onClick={clearAll}>Reset</button>
+                                <button type="button" className="qt-btn qt-btn-dark" onClick={() => setPanelOpen(false)}>
+                                    Show {visible.length} quote{visible.length === 1 ? "" : "s"}
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
 
-
-            {/* =========================================
-                ERROR
-            ========================================= */}
-
-            {error && (
-
-                <div className="alert alert-danger">
-
-                    <strong>
-                        Unable to load quotations.
-                    </strong>
-
-                    <div className="mt-1">
-                        {error}
-                    </div>
-
+            {/* Applied filters */}
+            {!loading && !error && quotations.length > 0 && (
+                <div className="qt-active" aria-live="polite">
+                    <span className="qt-result-count">{visible.length} quote{visible.length === 1 ? "" : "s"}</span>
+                    {groups.map((g) => (
+                        <button key={g} type="button" className="qt-tag" onClick={() => toggleGroup(g)} aria-label={`Remove ${GROUPS.find((x) => x.key === g)?.label} filter`}>
+                            {GROUPS.find((x) => x.key === g)?.label}
+                            <span className="qt-tag-x"><FaTimes aria-hidden="true" /></span>
+                        </button>
+                    ))}
+                    {isFiltered && <button type="button" className="qt-btn qt-btn-link" onClick={clearAll}>Clear all</button>}
                 </div>
-
             )}
 
+            {loading && (
+                <div className="qt-grid" aria-busy="true" aria-label="Loading quotations">
+                    {[0, 1, 2, 3].map((i) => <div key={i} className="qt-skeleton" />)}
+                </div>
+            )}
 
-            {/* =========================================
-                EMPTY
-            ========================================= */}
+            {!loading && error && (
+                <div className="qt-error" role="alert">
+                    <FaExclamationTriangle className="qt-error-ico" aria-hidden="true" />
+                    <div>
+                        <p className="qt-error-title">Unable to load quotations</p>
+                        <p className="qt-error-text">{error}</p>
+                        <button type="button" className="qt-btn" onClick={() => load()}>Try again</button>
+                    </div>
+                </div>
+            )}
 
-            {!error &&
-                quotations.length === 0 && (
+            {!loading && !error && visible.length === 0 && (
+                <div className="qt-state">
+                    <span className="qt-state-ico"><FaFileInvoiceDollar aria-hidden="true" /></span>
+                    <h2 className="qt-state-title">{quotations.length === 0 ? "No quotations yet" : "No matching quotations"}</h2>
+                    <p className="qt-state-text">
+                        {quotations.length === 0
+                            ? "Quotations you send to customers will appear here."
+                            : "Try a different status or search term."}
+                    </p>
+                    {quotations.length === 0 ? (
+                        <button type="button" className="qt-btn qt-btn-dark" onClick={() => navigate("/mechanic/requests")}>
+                            View my requests
+                        </button>
+                    ) : (
+                        <button type="button" className="qt-btn qt-btn-dark" onClick={clearAll}>Clear filters</button>
+                    )}
+                </div>
+            )}
 
-                    <div className="card border-0 shadow-sm">
+            {!loading && !error && visible.length > 0 && (
+                <div className="qt-grid">
+                    {visible.map((q) => (
+                        <QuotationCard
+                            key={q.id}
+                            q={q}
+                            onEdit={openEdit}
+                            onView={(id) => navigate(`/mechanic/requests/${id}`)}
+                        />
+                    ))}
+                </div>
+            )}
 
-                        <div className="card-body text-center py-5">
-
-                            <div className="fs-1 mb-3">
-                                💰
+            {editing && (
+                <div className="qt-overlay" onClick={closeEdit}>
+                    <form
+                        className="qt-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="qt-edit-title"
+                        onClick={(e) => e.stopPropagation()}
+                        onSubmit={handleSave}
+                    >
+                        <div className="qt-modal-head">
+                            <div>
+                                <h2 id="qt-edit-title" className="qt-modal-title">Edit quotation</h2>
+                                <p className="qt-modal-sub">
+                                    Request #{editing.serviceRequest?.id} · {editing.serviceRequest?.customer?.fullName || "Customer"}
+                                </p>
                             </div>
-
-                            <h5 className="fw-bold">
-                                No Quotations Yet
-                            </h5>
-
-                            <p className="text-muted mb-4">
-                                Quotations you send to customers
-                                will appear here.
-                            </p>
-
-                            <button
-                                className="btn btn-primary"
-                                onClick={() =>
-                                    navigate(
-                                        "/mechanic/requests"
-                                    )
-                                }
-                            >
-                                View My Requests
+                            <button type="button" className="qt-icon-btn" onClick={closeEdit} disabled={saving} aria-label="Close">
+                                <FaTimes aria-hidden="true" />
                             </button>
-
                         </div>
 
-                    </div>
-
-                )}
-
-
-            {/* =========================================
-                QUOTATIONS
-            ========================================= */}
-
-            {!error &&
-                quotations.length > 0 && (
-
-                    <div className="row g-4">
-
-                        {quotations.map(
-                            (quotation) => {
-
-                                const request =
-                                    quotation.serviceRequest;
-
-                                const canEdit =
-                                    quotation.paymentStatus ===
-                                    "PENDING" &&
-                                    request?.status === "QUOTATION_PENDING";
-
-
-                                return (
-
-                                    <div
-                                        className="col-12 col-lg-6"
-                                        key={quotation.id}
-                                    >
-
-                                        <div className="card border-0 shadow-sm h-100">
-
-                                            <div className="card-body p-4">
-
-                                                {/* HEADER */}
-
-                                                <div className="d-flex justify-content-between align-items-start mb-4">
-
-                                                    <div>
-
-                                                        <small className="text-muted">
-
-                                                            Request #
-
-                                                            {request?.id ||
-                                                                "—"}
-
-                                                        </small>
-
-
-                                                        <h5 className="fw-bold mb-1 mt-1">
-
-                                                            {request?.customer?.fullName ||
-                                                                "Customer"}
-
-                                                        </h5>
-
-
-                                                        <small className="text-muted">
-
-                                                            {request?.vehicle?.brand}{" "}
-
-                                                            {request?.vehicle?.model}
-
-                                                        </small>
-
-                                                    </div>
-
-
-                                                    {getQuotationDisplayStatus(quotation)}
-
-                                                </div>
-
-
-                                                {/* CHARGES */}
-
-                                                <div className="border rounded p-3 mb-4">
-
-                                                    <div className="d-flex justify-content-between mb-2">
-
-                                                        <span className="text-muted">
-                                                            Labour
-                                                        </span>
-
-                                                        <span>
-                                                            ₹
-                                                            {Number(
-                                                                quotation.labourCharge ||
-                                                                0
-                                                            ).toFixed(2)}
-                                                        </span>
-
-                                                    </div>
-
-
-                                                    <div className="d-flex justify-content-between mb-2">
-
-                                                        <span className="text-muted">
-                                                            Parts
-                                                        </span>
-
-                                                        <span>
-                                                            ₹
-                                                            {Number(
-                                                                quotation.partsCharge ||
-                                                                0
-                                                            ).toFixed(2)}
-                                                        </span>
-
-                                                    </div>
-
-
-                                                    <div className="d-flex justify-content-between mb-3">
-
-                                                        <span className="text-muted">
-                                                            Travel
-                                                        </span>
-
-                                                        <span>
-                                                            ₹
-                                                            {Number(
-                                                                quotation.travelFee ||
-                                                                0
-                                                            ).toFixed(2)}
-                                                        </span>
-
-                                                    </div>
-
-
-                                                    <hr />
-
-
-                                                    <div className="d-flex justify-content-between">
-
-                                                        <strong>
-                                                            Total
-                                                        </strong>
-
-                                                        <strong className="fs-5">
-                                                            ₹
-                                                            {Number(
-                                                                quotation.totalAmount ||
-                                                                0
-                                                            ).toFixed(2)}
-                                                        </strong>
-
-                                                    </div>
-
-                                                </div>
-
-
-                                                {/* REQUEST STATUS */}
-
-                                                <div className="mb-4">
-
-                                                    <small className="text-muted d-block mb-1">
-                                                        Request Status
-                                                    </small>
-
-                                                    <strong
-                                                        className={
-                                                            request?.status === "CANCELLED"
-                                                                ? "text-secondary"
-                                                                : request?.status === "COMPLETED"
-                                                                    ? "text-success"
-                                                                    : ""
-                                                        }
-                                                    >
-                                                        {request?.status || "Unknown"}
-                                                    </strong>
-
-                                                </div>
-
-
-                                                {/* ACTIONS */}
-
-                                                <div className="d-flex flex-column flex-sm-row gap-2">
-
-                                                    {canEdit && (
-
-                                                        <button
-                                                            className="btn btn-warning flex-grow-1"
-                                                            onClick={() =>
-                                                                handleEdit(
-                                                                    quotation
-                                                                )
-                                                            }
-                                                        >
-                                                            ✏️ Edit Quotation
-                                                        </button>
-
-                                                    )}
-
-
-                                                    {request?.id && (
-
-                                                        <button
-                                                            className="btn btn-outline-primary flex-grow-1"
-                                                            onClick={() =>
-                                                                navigate(
-                                                                    `/mechanic/requests/${request.id}`
-                                                                )
-                                                            }
-                                                        >
-                                                            View Request
-                                                        </button>
-
-                                                    )}
-
-                                                </div>
-
-
-                                                {/* EDITING INFO */}
-
-                                                {canEdit && (
-
-                                                    <small className="text-muted d-block mt-3">
-
-                                                        You can edit this quotation
-                                                        until the customer accepts it.
-
-                                                    </small>
-
-                                                )}
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                );
-
-                            }
-                        )}
-
-                    </div>
-
-                )}
-
-
-            {/* =========================================
-                EDIT QUOTATION MODAL
-            ========================================= */}
-
-            {editingQuotation && (
-
-                <div
-                    className="modal fade show d-block"
-                    tabIndex="-1"
-                    style={{
-                        backgroundColor:
-                            "rgba(0, 0, 0, 0.5)"
-                    }}
-                >
-
-                    <div className="modal-dialog modal-dialog-centered">
-
-                        <div className="modal-content">
-
-                            {/* HEADER */}
-
-                            <div className="modal-header">
-
-                                <div>
-
-                                    <h5 className="modal-title fw-bold">
-                                        ✏️ Edit Quotation
-                                    </h5>
-
-                                    <small className="text-muted">
-                                        Request #
-                                        {editingQuotation.serviceRequest?.id}
-                                    </small>
-
+                        {editError && <div className="qt-alert" role="alert">{editError}</div>}
+
+                        {CHARGES.map((c, i) => (
+                            <div className="qt-field" key={c.name}>
+                                <label htmlFor={`qt-${c.name}`}>
+                                    <span className={`qt-dot ${c.seg}`} aria-hidden="true" /> {c.label} charge
+                                </label>
+                                <div className="qt-money">
+                                    <span aria-hidden="true">₹</span>
+                                    <input
+                                        id={`qt-${c.name}`}
+                                        name={c.name}
+                                        type="number"
+                                        inputMode="decimal"
+                                        min="0"
+                                        step="0.01"
+                                        value={form[c.name]}
+                                        onChange={handleChange}
+                                        disabled={saving}
+                                        autoFocus={i === 0}
+                                        required
+                                    />
                                 </div>
-
-
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    onClick={handleCloseEdit}
-                                    disabled={saving}
-                                >
-                                </button>
-
                             </div>
+                        ))}
 
-
-                            {/* BODY */}
-
-                            <div className="modal-body">
-
-                                {editError && (
-
-                                    <div className="alert alert-danger">
-                                        {editError}
-                                    </div>
-
-                                )}
-
-
-                                <form
-                                    onSubmit={
-                                        handleSaveQuotation
-                                    }
-                                >
-
-                                    {/* LABOUR */}
-
-                                    <div className="mb-3">
-
-                                        <label className="form-label fw-semibold">
-                                            Labour Charge
-                                        </label>
-
-                                        <div className="input-group">
-
-                                            <span className="input-group-text">
-                                                ₹
-                                            </span>
-
-                                            <input
-                                                type="number"
-                                                name="labourCharge"
-                                                className="form-control"
-                                                min="0"
-                                                step="0.01"
-                                                value={
-                                                    editForm.labourCharge
-                                                }
-                                                onChange={
-                                                    handleEditChange
-                                                }
-                                                disabled={saving}
-                                                required
-                                            />
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* PARTS */}
-
-                                    <div className="mb-3">
-
-                                        <label className="form-label fw-semibold">
-                                            Parts Charge
-                                        </label>
-
-                                        <div className="input-group">
-
-                                            <span className="input-group-text">
-                                                ₹
-                                            </span>
-
-                                            <input
-                                                type="number"
-                                                name="partsCharge"
-                                                className="form-control"
-                                                min="0"
-                                                step="0.01"
-                                                value={
-                                                    editForm.partsCharge
-                                                }
-                                                onChange={
-                                                    handleEditChange
-                                                }
-                                                disabled={saving}
-                                                required
-                                            />
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* TRAVEL */}
-
-                                    <div className="mb-4">
-
-                                        <label className="form-label fw-semibold">
-                                            Travel Fee
-                                        </label>
-
-                                        <div className="input-group">
-
-                                            <span className="input-group-text">
-                                                ₹
-                                            </span>
-
-                                            <input
-                                                type="number"
-                                                name="travelFee"
-                                                className="form-control"
-                                                min="0"
-                                                step="0.01"
-                                                value={
-                                                    editForm.travelFee
-                                                }
-                                                onChange={
-                                                    handleEditChange
-                                                }
-                                                disabled={saving}
-                                                required
-                                            />
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* TOTAL */}
-
-                                    <div className="alert alert-light border mb-4">
-
-                                        <div className="d-flex justify-content-between align-items-center">
-
-                                            <span>
-                                                Updated Total
-                                            </span>
-
-                                            <strong className="fs-5">
-                                                ₹
-                                                {editTotal.toFixed(2)}
-                                            </strong>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* BUTTONS */}
-
-                                    <div className="d-flex justify-content-end gap-2">
-
-                                        <button
-                                            type="button"
-                                            className="btn btn-secondary"
-                                            onClick={
-                                                handleCloseEdit
-                                            }
-                                            disabled={saving}
-                                        >
-                                            Cancel
-                                        </button>
-
-
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary"
-                                            disabled={saving}
-                                        >
-
-                                            {saving
-                                                ? "Saving..."
-                                                : "Save Changes"}
-
-                                        </button>
-
-                                    </div>
-
-                                </form>
-
-                            </div>
-
+                        <div className="qt-new-total" aria-live="polite">
+                            <span>
+                                Updated total
+                                <small>
+                                    {diff === 0
+                                        ? "No change"
+                                        : `${diff > 0 ? "+" : "−"}${money(Math.abs(diff))} from ${money(oldTotal)}`}
+                                </small>
+                            </span>
+                            <strong>{money(newTotal)}</strong>
                         </div>
 
-                    </div>
-
+                        <div className="qt-modal-actions">
+                            <button type="button" className="qt-btn" onClick={closeEdit} disabled={saving}>Cancel</button>
+                            <button type="submit" className="qt-btn qt-btn-dark" disabled={saving || newTotal <= 0 || unchanged}>
+                                {saving ? "Saving…" : "Save changes"}
+                            </button>
+                        </div>
+                    </form>
                 </div>
-
             )}
-
-        </MechanicLayout>
-
+        </div>
     );
-
 }
 
+function Quotations() {
+    return (
+        <MechanicLayout>
+            <QuotationsContent />
+        </MechanicLayout>
+    );
+}
 
 export default Quotations;

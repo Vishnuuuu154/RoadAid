@@ -1,0 +1,248 @@
+/* ==========================================================================
+   Admin: Analytics hub
+   Same ink + amber set as the other admin pages. Classes use the an- prefix
+   and live under .an-root.
+   ========================================================================== */
+
+.an-root {
+    --an-ink: #181b24;
+    --an-text: #3b4150;
+    --an-muted: #6b7280;
+    --an-line: #e8eaee;
+    --an-surface: #ffffff;
+    --an-field: #f6f7f9;
+    --an-accent: #e8912a;
+    --an-accent-strong: #b8650a;
+    --an-accent-soft: #fdf1e2;
+
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--an-text);
+}
+
+.an-root *,
+.an-root *::before,
+.an-root *::after {
+    box-sizing: border-box;
+}
+
+.an-root h1,
+.an-root h2,
+.an-root p {
+    margin: 0;
+    padding: 0;
+}
+
+.an-root :focus-visible {
+    outline: 3px solid rgba(232, 145, 42, 0.6);
+    outline-offset: 2px;
+}
+
+/* ---------- Header ---------- */
+
+.an-title {
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--an-ink);
+}
+
+.an-sub {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--an-muted);
+}
+
+/* ---------- Overview hero ---------- */
+
+/* Two class names so this beats any general link colour rule. */
+.an-root .an-hero {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 24px 26px;
+    color: #fff;
+    text-decoration: none;
+    background: var(--an-ink);
+    border-radius: 18px;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.an-root .an-hero:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(16, 24, 40, 0.22);
+}
+
+.an-hero-icon {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--an-ink);
+    background: var(--an-accent);
+    border-radius: 16px;
+}
+
+.an-hero-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.an-root .an-hero-text strong {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+}
+
+.an-root .an-hero-text span {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.an-root .an-hero-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    font-weight: 700;
+    color: #fff;
+}
+
+/* ---------- Sections ---------- */
+
+.an-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.an-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--an-muted);
+}
+
+.an-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+/* ---------- Cards ---------- */
+
+.an-root .an-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    color: var(--an-text);
+    text-decoration: none;
+    background: var(--an-surface);
+    border: 1px solid var(--an-line);
+    border-radius: 16px;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.an-root .an-card:hover {
+    border-color: var(--an-accent);
+    box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
+    transform: translateY(-2px);
+}
+
+.an-card-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--an-accent-strong);
+    background: var(--an-accent-soft);
+    border-radius: 14px;
+}
+
+.an-card-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.an-root .an-card-text strong {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--an-ink);
+}
+
+.an-card-text span {
+    font-size: 14px;
+    color: var(--an-muted);
+}
+
+.an-card-go {
+    flex-shrink: 0;
+    color: #b6bac4;
+    transition: transform 0.15s, color 0.15s;
+}
+
+.an-root .an-card:hover .an-card-go {
+    color: var(--an-accent-strong);
+    transform: translateX(3px);
+}
+
+/* ---------- Phones ---------- */
+
+@media (max-width: 600px) {
+    .an-root {
+        gap: 24px;
+    }
+
+    .an-title {
+        font-size: 24px;
+    }
+
+    .an-root .an-hero {
+        padding: 18px;
+        gap: 14px;
+    }
+
+    .an-hero-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .an-root .an-hero-go {
+        display: none;
+    }
+
+    .an-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .an-root .an-hero,
+    .an-root .an-card,
+    .an-card-go {
+        transition: none;
+    }
+
+    .an-root .an-hero:hover,
+    .an-root .an-card:hover {
+        transform: none;
+    }
+}

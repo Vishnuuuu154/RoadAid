@@ -1,236 +1,151 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { logout } from "../services/authService";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { logout, getUser } from "../services/authService";
+import api from "../services/api";
+import NotificationBell from "../components/NotificationBell";
+import CustomerSidebar, { RoadAidMark } from "../components/customer/CustomerSidebar";
+import { FaBars, FaSignOutAlt, FaChevronDown, FaUser } from "react-icons/fa";
+import "../styles/Customer layout.css";
+
+function initialsOf(name) {
+    if (!name) return "?";
+    return name
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((p) => p[0]?.toUpperCase())
+        .join("");
+}
 
 function CustomerLayout({ children }) {
-
-    const location = useLocation();
     const navigate = useNavigate();
+    const user = getUser?.() || null;
+
+    const [mobileNavOpen, setMobileNavOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [profileImage, setProfileImage] = useState("");
+    const menuRef = useRef(null);
+
+    useEffect(() => {
+        const loadProfileImage = async () => {
+            try {
+                const response = await api.get("/users/profile");
+                setProfileImage(response.data?.profileImage || "");
+            } catch (error) {
+                console.error("Failed to load profile image:", error);
+            }
+        };
+
+        loadProfileImage();
+    }, []);
+
+    // Close the account menu on outside click or Escape.
+    useEffect(() => {
+        if (!menuOpen) return undefined;
+        const onPointerDown = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+        };
+        const onKeyDown = (e) => {
+            if (e.key === "Escape") setMenuOpen(false);
+        };
+        document.addEventListener("pointerdown", onPointerDown);
+        document.addEventListener("keydown", onKeyDown);
+        return () => {
+            document.removeEventListener("pointerdown", onPointerDown);
+            document.removeEventListener("keydown", onKeyDown);
+        };
+    }, [menuOpen]);
 
     const handleLogout = () => {
         logout();
         navigate("/");
     };
 
-    const isActive = (path) => {
-        return location.pathname === path;
-    };
+    const firstName = (user?.fullName || "Customer").split(" ")[0];
 
     return (
+        <div className="cl-shell">
+            <a className="cl-skip" href="#main-content">Skip to main content</a>
 
-        <div className="d-flex flex-column min-vh-100">
-
-            {/* Top Navbar */}
-
-            <nav className="navbar navbar-dark bg-primary px-3">
-
-                <Link
-                    to="/customer"
-                    className="navbar-brand fw-bold"
-                >
-                    🚗 RoadAid
-                </Link>
-
-                <div className="d-flex align-items-center">
-
-                    <Link
-                        to="/customer"
-                        className="text-white text-decoration-none me-4"
-                    >
-                        Home
-                    </Link>
-
-                    <span className="text-white me-3">
-                        Customer
-                    </span>
-
+            <header className="cl-topbar">
+                <div className="cl-side-group">
                     <button
-                        className="btn btn-light"
-                        onClick={handleLogout}
+                        type="button"
+                        className="cl-icon-btn cl-menu-trigger"
+                        onClick={() => setMobileNavOpen(true)}
+                        aria-label="Open menu"
                     >
-                        Logout
+                        <FaBars size={18} aria-hidden="true" />
                     </button>
 
+                    <div className="cl-brand">
+                        <span className="cl-brand-mark">
+                            <RoadAidMark size={18} />
+                        </span>
+                        RoadAid
+                    </div>
                 </div>
 
-            </nav>
+                <div className="cl-side-group">
+                    <NotificationBell notificationsPath="/customer/notifications" />
 
+                    <div className="cl-user-wrap" ref={menuRef}>
+                        <button
+                            type="button"
+                            className="cl-user"
+                            onClick={() => setMenuOpen((v) => !v)}
+                            aria-expanded={menuOpen}
+                            aria-controls="cl-account-menu"
+                        >
+                            <span className="cl-avatar">
+                                {profileImage ? (
+                                    <img src={profileImage} alt="" />
+                                ) : (
+                                    initialsOf(user?.fullName)
+                                )}
+                            </span>
+                            <span className="cl-user-name">{firstName}</span>
+                            <FaChevronDown size={10} aria-hidden="true" className={menuOpen ? "cl-chevron open" : "cl-chevron"} />
+                            <span className="cl-sr">Account menu</span>
+                        </button>
 
-            {/* Main Area */}
+                        {menuOpen && (
+                            <div className="cl-menu" id="cl-account-menu">
+                                <div className="cl-menu-head">
+                                    <strong>{user?.fullName || "Customer"}</strong>
+                                    <span>{user?.email || "Signed in"}</span>
+                                </div>
 
-            <div className="d-flex flex-grow-1">
+                                <Link
+                                    to="/customer/profile"
+                                    className="cl-menu-item"
+                                    onClick={() => setMenuOpen(false)}
+                                >
+                                    <FaUser size={14} aria-hidden="true" />
+                                    My profile
+                                </Link>
 
-                {/* Sidebar */}
+                                <button type="button" className="cl-menu-item danger" onClick={handleLogout}>
+                                    <FaSignOutAlt size={14} aria-hidden="true" />
+                                    Log out
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </header>
 
-                <aside
-                    className="bg-dark text-white p-3"
-                    style={{
-                        width: "240px",
-                        minHeight: "calc(100vh - 56px)"
-                    }}
-                >
+            <div className="cl-body">
+                <CustomerSidebar
+                    mobileOpen={mobileNavOpen}
+                    onMobileClose={() => setMobileNavOpen(false)}
+                />
 
-                    <h5 className="mb-4">
-                        Customer Panel
-                    </h5>
-
-
-                    <ul className="nav nav-pills flex-column gap-2">
-
-                        <li className="nav-item">
-
-                            <Link
-                                to="/customer"
-                                className={`nav-link ${
-                                    isActive("/customer")
-                                        ? "active"
-                                        : "text-white"
-                                }`}
-                            >
-                                🏠 Dashboard
-                            </Link>
-
-                        </li>
-
-
-                        <li className="nav-item">
-
-                            <Link
-                                to="/customer/vehicles"
-                                className={`nav-link ${
-                                    isActive("/customer/vehicles")
-                                        ? "active"
-                                        : "text-white"
-                                }`}
-                            >
-                                🚗 My Vehicles
-                            </Link>
-
-                        </li>
-
-
-                        <li className="nav-item">
-
-                            <Link
-                                to="/customer/requests"
-                                className={`nav-link ${
-                                    isActive("/customer/requests")
-                                        ? "active"
-                                        : "text-white"
-                                }`}
-                            >
-                                📋 My Requests
-                            </Link>
-
-                        </li>
-
-
-                        <li className="nav-item">
-
-                            <Link
-                                to="/customer/favorites"
-                                className={`nav-link ${
-                                    isActive("/customer/favorites")
-                                        ? "active"
-                                        : "text-white"
-                                }`}
-                            >
-                                ❤️ Favorite Mechanics
-                            </Link>
-
-                        </li>
-
-
-                        <li className="nav-item">
-
-                            <Link
-                                to="/customer/payments"
-                                className={`nav-link ${
-                                    isActive("/customer/payments")
-                                        ? "active"
-                                        : "text-white"
-                                }`}
-                            >
-                                💳 Payments
-                            </Link>
-
-                        </li>
-
-
-                        <li className="nav-item">
-
-                            <Link
-                                to="/customer/notifications"
-                                className={`nav-link ${
-                                    isActive("/customer/notifications")
-                                        ? "active"
-                                        : "text-white"
-                                }`}
-                            >
-                                🔔 Notifications
-                            </Link>
-
-                        </li>
-
-
-                        <li className="nav-item">
-
-                            <Link
-                                to="/customer/reviews"
-                                className={`nav-link ${
-                                    isActive("/customer/reviews")
-                                        ? "active"
-                                        : "text-white"
-                                }`}
-                            >
-                                ⭐ My Reviews
-                            </Link>
-
-                        </li>
-
-
-                        <li className="nav-item">
-
-                            <Link
-                                to="/customer/profile"
-                                className={`nav-link ${
-                                    isActive("/customer/profile")
-                                        ? "active"
-                                        : "text-white"
-                                }`}
-                            >
-                                👤 Profile
-                            </Link>
-
-                        </li>
-
-                    </ul>
-
-
-                    <hr className="border-secondary mt-4" />
-
-
-                    <button
-                        className="btn btn-outline-danger w-100"
-                        onClick={handleLogout}
-                    >
-                        🚪 Logout
-                    </button>
-
-                </aside>
-
-
-                {/* Page Content */}
-
-                <main className="flex-grow-1 p-4 bg-light">
-
-                    {children}
-
+                <main className="cl-main" id="main-content" tabIndex={-1}>
+                    <div className="cl-content">{children}</div>
                 </main>
-
             </div>
-
         </div>
-
     );
 }
 

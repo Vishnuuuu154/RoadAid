@@ -66,11 +66,53 @@ public class Payment {
     public void setPaymentDate(LocalDateTime paymentDate) {
         this.paymentDate = paymentDate;
     }
+    public String getRazorpayOrderId() {
+        return razorpayOrderId;
+    }
+
+    public void setRazorpayOrderId(String razorpayOrderId) {
+        this.razorpayOrderId = razorpayOrderId;
+    }
+
+    public String getRazorpayPaymentId() {
+        return razorpayPaymentId;
+    }
+
+    public void setRazorpayPaymentId(String razorpayPaymentId) {
+        this.razorpayPaymentId = razorpayPaymentId;
+    }
+
+    public String getRazorpaySignature() {
+        return razorpaySignature;
+    }
+
+    public void setRazorpaySignature(String razorpaySignature) {
+        this.razorpaySignature = razorpaySignature;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
 
     @Column(nullable = false)
-    private String paymentStatus = "SUCCESS";
-    @Column(nullable = false)
+    private String paymentStatus = "PENDING";
+    @Column
     private java.time.LocalDateTime paymentDate;
+    @Column
+    private String razorpayOrderId;
+
+    @Column
+    private String razorpayPaymentId;
+
+    @Column
+    private String razorpaySignature;
+
+    @Column(nullable = false)
+    private String currency = "INR";
     public Payment() {
     }
 

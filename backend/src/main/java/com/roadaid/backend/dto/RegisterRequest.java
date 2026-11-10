@@ -44,4 +44,12 @@ public class RegisterRequest {
 
     private String contactNumber;
 
+
+// Towing Provider-specific fields
+
+    private String businessName;
+
+    private String businessAddress;
+
+
 }

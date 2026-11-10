@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 @Entity
 @Data
 @NoArgsConstructor
@@ -23,7 +23,7 @@ public class Notification {
 
     @Column(nullable = false, length = 500)
     private String message;
-
+    @JsonProperty("isRead")
     @Column(nullable = false)
     private boolean isRead = false;
 

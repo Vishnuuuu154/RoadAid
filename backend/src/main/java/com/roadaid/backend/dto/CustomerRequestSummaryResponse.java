@@ -9,6 +9,8 @@ public class CustomerRequestSummaryResponse {
     private String mechanic;
     private String status;
     private LocalDateTime createdAt;
+    private LocalDateTime completedAt;
+    private String serviceStage;
 
     public Long getRequestId() {
         return requestId;
@@ -48,5 +50,19 @@ public class CustomerRequestSummaryResponse {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(LocalDateTime completedAt) {
+        this.completedAt = completedAt;
+    }
+    public String getServiceStage() {
+        return serviceStage;
+    }
+
+    public void setServiceStage(String serviceStage) {
+        this.serviceStage = serviceStage;
     }
 }

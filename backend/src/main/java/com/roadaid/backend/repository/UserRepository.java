@@ -7,7 +7,7 @@ import com.roadaid.backend.entity.User;
 import java.util.List;
 import java.util.Optional;
 
-import java.util.Optional;
+import java.util.Optional;import java.time.LocalDateTime;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
@@ -23,4 +23,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             String email
     );
     Optional<User> findByPhone(String phone);
+    long countByRoleAndCreatedAtBetween(
+            String role,
+            LocalDateTime start,
+            LocalDateTime end
+    );
 }

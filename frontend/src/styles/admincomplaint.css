@@ -1,0 +1,836 @@
+/* ==========================================================================
+   Reviews & Complaints (admin) — admincomplaint.css
+   Same token system as the rest of the app (graphite ink, amber accent,
+   Space Grotesk / Inter). Scoped under .cx so nothing leaks out.
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap");
+
+.cx {
+    --ink: #1b1e24;
+    --ink-soft: #5b6270;
+    --ink-faint: #8b909c;
+
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --border: #e4e6eb;
+    --border-strong: #d3d6dc;
+
+    --accent: #e2661f;
+    --accent-dark: #b14e16;
+    --accent-soft: #fdece0;
+
+    --success: #1e7a43;
+    --success-soft: #e9f7ef;
+    --success-border: #c9ead6;
+
+    --danger: #c23b31;
+    --danger-soft: #fdebeb;
+    --danger-border: #f4c9c6;
+
+    --warning: #9a5b00;
+    --warning-soft: #fff4e5;
+    --warning-border: #f6dcb0;
+
+    --neutral: #676c76;
+    --neutral-soft: #f1f2f4;
+    --neutral-border: #dfe0e5;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--ink);
+}
+
+.cx * {
+    box-sizing: border-box;
+}
+
+.cx h1, .cx h2, .cx h3 {
+    font-family: "Space Grotesk", "Inter", sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cx *, .cx *::before, .cx *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+
+.cx button:focus-visible,
+.cx input:focus-visible,
+.cx select:focus-visible,
+.cx a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.cx-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Header                                                                  */
+/* ---------------------------------------------------------------------- */
+
+.cx-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.cx-title {
+    font-size: 25px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
+}
+
+.cx-sub {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--ink-soft);
+}
+
+.cx-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.cx-btn:hover:not(:disabled) {
+    background: var(--bg);
+}
+
+.cx-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.cx-btn svg {
+    width: 15px;
+    height: 15px;
+}
+
+.cx-btn--dark {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+}
+
+.cx-btn--dark:hover:not(:disabled) {
+    background: #2a2d34;
+}
+
+@keyframes cx-spin {
+    to { transform: rotate(360deg); }
+}
+
+.cx-spin {
+    animation: cx-spin 0.8s linear infinite;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Error banner                                                           */
+/* ---------------------------------------------------------------------- */
+
+.cx-alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    background: var(--danger-soft);
+    border: 1px solid var(--danger-border);
+    border-radius: var(--radius-md);
+    color: var(--danger);
+    font-size: 14px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Stat strip                                                             */
+/* ---------------------------------------------------------------------- */
+
+.cx-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 0 0 22px;
+}
+
+.cx-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+}
+
+.cx-stat dt {
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+}
+
+.cx-stat dd {
+    margin: 0;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.cx-stat dd small {
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-faint);
+    margin-left: 2px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Tabs                                                                    */
+/* ---------------------------------------------------------------------- */
+
+.cx-tabs {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--bg);
+    border-radius: var(--radius-md);
+    margin-bottom: 18px;
+}
+
+.cx-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.cx-tab[aria-selected="true"] {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(27, 30, 36, 0.12);
+}
+
+.cx-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--neutral-soft);
+    color: var(--ink-soft);
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.cx-tab[aria-selected="true"] .cx-count {
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Panel (search / sort / chips / table)                                  */
+/* ---------------------------------------------------------------------- */
+
+.cx-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.cx-panel__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.cx-panel__top h2 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 2px;
+}
+
+.cx-panel__hint {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ink-faint);
+}
+
+.cx-tools {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cx-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cx-search svg {
+    position: absolute;
+    left: 11px;
+    width: 15px;
+    height: 15px;
+    color: var(--ink-faint);
+    pointer-events: none;
+}
+
+.cx-input {
+    width: 260px;
+    max-width: 100%;
+    padding: 9px 12px 9px 34px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13.5px;
+    color: var(--ink);
+    background: var(--surface);
+}
+
+.cx-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.cx-select-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.cx-select {
+    padding: 9px 30px 9px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13.5px;
+    color: var(--ink);
+    background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b909c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+    appearance: none;
+    cursor: pointer;
+}
+
+.cx-select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Chips                                                                   */
+/* ---------------------------------------------------------------------- */
+
+.cx-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.cx-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.cx-chip:hover {
+    border-color: var(--border-strong);
+}
+
+.cx-chip span {
+    font-size: 11.5px;
+    opacity: 0.7;
+}
+
+.cx-chip[aria-pressed="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Meta row                                                                */
+/* ---------------------------------------------------------------------- */
+
+.cx-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 2px;
+    font-size: 13px;
+    color: var(--ink-faint);
+}
+
+.cx-meta strong {
+    color: var(--ink);
+}
+
+.cx-link-btn {
+    border: none;
+    background: none;
+    color: var(--accent-dark);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.cx-link-btn:hover {
+    text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Table                                                                   */
+/* ---------------------------------------------------------------------- */
+
+.cx-scroll {
+    overflow-x: auto;
+    margin: 0 -4px;
+}
+
+.cx-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.cx-table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.cx-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink);
+    vertical-align: top;
+}
+
+.cx-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.cx-table tbody tr.is-clickable {
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+}
+
+.cx-table tbody tr.is-clickable:hover {
+    background: var(--bg);
+}
+
+.cx-muted {
+    color: var(--ink-faint);
+}
+
+.cx-date {
+    white-space: nowrap;
+    color: var(--ink-soft);
+}
+
+.cx-id-btn {
+    border: none;
+    background: none;
+    padding: 0;
+    color: var(--ink);
+    font-weight: 600;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+}
+
+.cx-id-btn:hover {
+    color: var(--accent-dark);
+    text-decoration: underline;
+}
+
+.cx-req {
+    color: var(--accent-dark);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.cx-req:hover {
+    text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Stars + rating                                                          */
+/* ---------------------------------------------------------------------- */
+
+.cx-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cx-stars {
+    display: inline-flex;
+    gap: 1px;
+}
+
+.cx-stars svg {
+    width: 14px;
+    height: 14px;
+    fill: var(--border-strong);
+}
+
+.cx-stars svg.on {
+    fill: var(--accent);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Status pill                                                             */
+/* ---------------------------------------------------------------------- */
+
+.cx-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cx-pill--danger { background: var(--danger-soft); color: var(--danger); }
+.cx-pill--warning { background: var(--warning-soft); color: var(--warning); }
+.cx-pill--success { background: var(--success-soft); color: var(--success); }
+.cx-pill--neutral { background: var(--neutral-soft); color: var(--neutral); }
+
+/* ---------------------------------------------------------------------- */
+/* Expandable text                                                         */
+/* ---------------------------------------------------------------------- */
+
+.cx-text {
+    margin: 0 0 4px;
+    line-height: 1.5;
+    max-width: 320px;
+}
+
+.cx-text.is-clamped {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.cx-more {
+    border: none;
+    background: none;
+    padding: 0;
+    color: var(--accent-dark);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cx-more:hover {
+    text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Drawer                                                                  */
+/* ---------------------------------------------------------------------- */
+
+.cx-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(27, 30, 36, 0.5);
+    display: flex;
+    justify-content: flex-end;
+    animation: cx-fade-in 0.15s ease;
+}
+
+@keyframes cx-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.cx-drawer {
+    width: 100%;
+    max-width: 440px;
+    height: 100%;
+    background: var(--surface);
+    box-shadow: -16px 0 40px rgba(27, 30, 36, 0.18);
+    display: flex;
+    flex-direction: column;
+    animation: cx-slide-in 0.2s ease;
+}
+
+@keyframes cx-slide-in {
+    from { transform: translateX(16px); opacity: 0.6; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.cx-drawer__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--border);
+}
+
+.cx-drawer__head h2 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 8px;
+}
+
+.cx-close {
+    border: none;
+    background: var(--bg);
+    color: var(--ink-soft);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.cx-close:hover {
+    background: var(--border);
+    color: var(--ink);
+}
+
+.cx-drawer__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.cx-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+}
+
+.cx-quote {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 13px 15px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink);
+}
+
+.cx-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+    margin: 0;
+}
+
+.cx-field dt {
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-bottom: 3px;
+}
+
+.cx-field dd {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.cx-save {
+    margin-top: 14px;
+    width: 100%;
+}
+
+.cx-msg {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: var(--success);
+    min-height: 16px;
+}
+
+.cx-msg.is-error {
+    color: var(--danger);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Skeleton loading                                                        */
+/* ---------------------------------------------------------------------- */
+
+.cx-skel-row {
+    display: flex;
+    gap: 14px;
+    padding: 13px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.cx-skel {
+    flex: 1;
+    height: 14px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #ececef 25%, #f4f4f6 37%, #ececef 63%);
+    background-size: 400% 100%;
+    animation: cx-shimmer 1.4s ease infinite;
+}
+
+@keyframes cx-shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: 0 0; }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Empty state                                                             */
+/* ---------------------------------------------------------------------- */
+
+.cx-empty {
+    text-align: center;
+    padding: 56px 20px;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-md);
+}
+
+.cx-empty h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    color: var(--ink);
+}
+
+.cx-empty p {
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    color: var(--ink-faint);
+}
+
+.cx-empty .cx-btn {
+    display: inline-flex;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Responsive                                                              */
+/* ---------------------------------------------------------------------- */
+
+@media (max-width: 760px) {
+    .cx-panel__top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cx-tools {
+        flex-direction: column;
+    }
+
+    .cx-input {
+        width: 100%;
+    }
+
+    .cx-table thead {
+        display: none;
+    }
+
+    .cx-table, .cx-table tbody, .cx-table tr, .cx-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .cx-table tr {
+        padding: 12px 4px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .cx-table td {
+        border-bottom: none;
+        padding: 4px 8px;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        text-align: right;
+    }
+
+    .cx-table td::before {
+        content: attr(data-label);
+        font-size: 11.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ink-faint);
+        text-align: left;
+    }
+
+    .cx-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .cx-drawer {
+        max-width: 100%;
+    }
+}

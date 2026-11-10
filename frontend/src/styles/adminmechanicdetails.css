@@ -1,0 +1,581 @@
+/* ==========================================================================
+   Mechanic details (admin) — adminmechanicdetails.css
+   Same token system as the rest of the app. Scoped under .mdet.
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap");
+
+.mdet {
+    --ink: #1b1e24;
+    --ink-soft: #5b6270;
+    --ink-faint: #8b909c;
+
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --border: #e4e6eb;
+    --border-strong: #d3d6dc;
+
+    --accent: #e2661f;
+    --accent-dark: #b14e16;
+    --accent-soft: #fdece0;
+
+    --success: #1e7a43;
+    --success-soft: #e9f7ef;
+
+    --danger: #c23b31;
+    --danger-soft: #fdebeb;
+    --danger-border: #f4c9c6;
+
+    --warning: #9a5b00;
+    --warning-soft: #fff4e5;
+
+    --info: #1c5aa0;
+    --info-soft: #eaf2ff;
+
+    --neutral: #676c76;
+    --neutral-soft: #f1f2f4;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--ink);
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.mdet * {
+    box-sizing: border-box;
+}
+
+.mdet h1, .mdet h2, .mdet h3 {
+    font-family: "Space Grotesk", "Inter", sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mdet *, .mdet *::before, .mdet *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+
+.mdet button:focus-visible,
+.mdet [role="button"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Back link                                                               */
+/* ---------------------------------------------------------------------- */
+
+.mdet-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding: 4px 0;
+    margin-bottom: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+}
+
+.mdet-back:hover {
+    color: var(--ink);
+}
+
+.mdet-back svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Loading / error states                                                  */
+/* ---------------------------------------------------------------------- */
+
+.mdet-loading {
+    text-align: center;
+    padding: 90px 20px;
+    color: var(--ink-soft);
+}
+
+.mdet-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    animation: mdet-spin 0.8s linear infinite;
+}
+
+@keyframes mdet-spin {
+    to { transform: rotate(360deg); }
+}
+
+.mdet-error {
+    background: var(--danger-soft);
+    border: 1px solid var(--danger-border);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    color: var(--danger);
+    font-size: 14.5px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Profile header                                                          */
+/* ---------------------------------------------------------------------- */
+
+.mdet-profile {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 20px;
+}
+
+.mdet-identity {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.mdet-avatar {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(155deg, #f0813a 0%, var(--accent) 55%, var(--accent-dark) 100%);
+    color: #fff;
+}
+
+.mdet-identity h1 {
+    font-size: 23px;
+    font-weight: 600;
+    margin: 0 0 3px;
+}
+
+.mdet-identity p {
+    margin: 0 0 3px;
+    font-size: 14.5px;
+    color: var(--ink-soft);
+}
+
+.mdet-identity small {
+    font-size: 12.5px;
+    color: var(--ink-faint);
+}
+
+.mdet-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.mdet-pill__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.mdet-pill--available { background: var(--success-soft); color: var(--success); }
+.mdet-pill--available .mdet-pill__dot { background: var(--success); }
+
+.mdet-pill--offline { background: var(--neutral-soft); color: var(--neutral); }
+.mdet-pill--offline .mdet-pill__dot { background: var(--ink-faint); }
+
+/* ---------------------------------------------------------------------- */
+/* Stat grid                                                                */
+/* ---------------------------------------------------------------------- */
+
+.mdet-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.mdet-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+}
+
+.mdet-stat__label {
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+}
+
+.mdet-stat__value {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.mdet-stat__value svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+    vertical-align: -2px;
+    color: var(--warning);
+}
+
+.mdet-stat__value.is-success { color: var(--success); }
+.mdet-stat__value.is-warning { color: var(--warning); }
+
+.mdet-stat__unit {
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-faint);
+    margin-left: 3px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Info cards (contact / workshop)                                         */
+/* ---------------------------------------------------------------------- */
+
+.mdet-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 760px) {
+    .mdet-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.mdet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+}
+
+.mdet-card h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 18px;
+}
+
+.mdet-field {
+    margin-bottom: 16px;
+}
+
+.mdet-field:last-child {
+    margin-bottom: 0;
+}
+
+.mdet-field-label {
+    display: block;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    margin-bottom: 3px;
+}
+
+.mdet-field-value {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.mdet-field-value.mdet-muted {
+    font-weight: 500;
+    color: var(--ink-faint);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Section card (service history / reviews)                                */
+/* ---------------------------------------------------------------------- */
+
+.mdet-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 20px;
+}
+
+.mdet-section:last-child {
+    margin-bottom: 0;
+}
+
+.mdet-section__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.mdet-section__head h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 3px;
+}
+
+.mdet-section__head p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ink-faint);
+}
+
+.mdet-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.mdet-count svg {
+    width: 13px;
+    height: 13px;
+    color: var(--warning);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Service history table                                                   */
+/* ---------------------------------------------------------------------- */
+
+.mdet-scroll {
+    overflow-x: auto;
+    margin: 0 -4px;
+}
+
+.mdet-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.mdet-table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.mdet-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink);
+    vertical-align: middle;
+}
+
+.mdet-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.mdet-table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+}
+
+.mdet-table tbody tr:hover,
+.mdet-table tbody tr:focus-visible {
+    background: var(--bg);
+}
+
+.mdet-table tbody tr:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.mdet-req-id {
+    font-weight: 600;
+    color: var(--accent-dark);
+}
+
+.mdet-issue {
+    display: inline-block;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mdet-date {
+    white-space: nowrap;
+    color: var(--ink-soft);
+}
+
+/* status pill reused for requests */
+.mdet-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.mdet-status-pill--success { background: var(--success-soft); color: var(--success); }
+.mdet-status-pill--danger { background: var(--danger-soft); color: var(--danger); }
+.mdet-status-pill--info { background: var(--info-soft); color: var(--info); }
+.mdet-status-pill--warning { background: var(--warning-soft); color: var(--warning); }
+
+/* ---------------------------------------------------------------------- */
+/* Reviews list                                                            */
+/* ---------------------------------------------------------------------- */
+
+.mdet-review {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.mdet-review:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.mdet-review:first-child {
+    padding-top: 0;
+}
+
+.mdet-review__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.mdet-review__customer {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink);
+}
+
+.mdet-review__request {
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    margin-top: 1px;
+}
+
+.mdet-stars {
+    display: inline-flex;
+    gap: 1px;
+    flex-shrink: 0;
+}
+
+.mdet-stars svg {
+    width: 15px;
+    height: 15px;
+    fill: var(--border-strong);
+}
+
+.mdet-stars svg.on {
+    fill: var(--warning);
+}
+
+.mdet-review__comment {
+    margin: 10px 0 6px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    font-style: italic;
+}
+
+.mdet-review__date {
+    font-size: 12px;
+    color: var(--ink-faint);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Loading / empty states for sub-lists                                    */
+/* ---------------------------------------------------------------------- */
+
+.mdet-skel-row {
+    display: flex;
+    gap: 14px;
+    padding: 13px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.mdet-skel {
+    flex: 1;
+    height: 14px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #ececef 25%, #f4f4f6 37%, #ececef 63%);
+    background-size: 400% 100%;
+    animation: mdet-shimmer 1.4s ease infinite;
+}
+
+@keyframes mdet-shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: 0 0; }
+}
+
+.mdet-empty {
+    text-align: center;
+    padding: 44px 20px;
+    color: var(--ink-faint);
+}
+
+.mdet-empty svg {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 12px;
+    color: var(--ink-faint);
+}
+
+.mdet-empty p {
+    margin: 0;
+    font-size: 13.5px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Responsive                                                               */
+/* ---------------------------------------------------------------------- */
+
+@media (max-width: 560px) {
+    .mdet-profile {
+        flex-direction: column;
+    }
+
+    .mdet-identity h1 {
+        font-size: 20px;
+    }
+}

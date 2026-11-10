@@ -18,22 +18,29 @@ import java.util.List;
 @Service
 public class ComplaintService {
 
+    private static final long COMPLAINT_WINDOW_DAYS = 7;
+
     private final ComplaintRepository complaintRepository;
     private final ServiceRequestRepository serviceRequestRepository;
     private final UserRepository userRepository;
+    private final SystemLogService systemLogService;
 
     public ComplaintService(
             ComplaintRepository complaintRepository,
             ServiceRequestRepository serviceRequestRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            SystemLogService systemLogService
     ) {
         this.complaintRepository = complaintRepository;
         this.serviceRequestRepository = serviceRequestRepository;
         this.userRepository = userRepository;
+        this.systemLogService = systemLogService;
     }
+
     public Complaint createComplaint(ComplaintRequest request) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
         User reportedBy = userRepository.findByEmail(email)
@@ -43,19 +50,73 @@ public class ComplaintService {
                 .findById(request.getServiceRequestId())
                 .orElseThrow(() -> new RuntimeException("Service request not found"));
 
+        // Complaints are only valid for completed/closed services.
+        if (!"COMPLETED".equals(serviceRequest.getStatus())
+                && !"CLOSED".equals(serviceRequest.getStatus())) {
+            throw new RuntimeException(
+                    "A complaint can only be raised after the service is completed"
+            );
+        }
+
+        // The backend is the final authority for the 7-day complaint window.
+        if (serviceRequest.getCompletedAt() == null) {
+            throw new RuntimeException(
+                    "The completion time for this service is unavailable"
+            );
+        }
+
+        LocalDateTime complaintDeadline =
+                serviceRequest.getCompletedAt().plusDays(COMPLAINT_WINDOW_DAYS);
+
+        if (LocalDateTime.now().isAfter(complaintDeadline)) {
+            throw new RuntimeException(
+                    "The 7-day complaint window for this service has expired"
+            );
+        }
+
         User reportedAgainst;
 
         if (reportedBy.getRole().equals("CUSTOMER")) {
 
+            // Prevent a customer from filing against someone else's request.
+            if (serviceRequest.getCustomer() == null
+                    || !serviceRequest.getCustomer().getId().equals(reportedBy.getId())) {
+                throw new RuntimeException(
+                        "You can only raise complaints for your own service requests"
+                );
+            }
+
             if (serviceRequest.getMechanic() == null) {
-                throw new RuntimeException("No mechanic has been assigned to this request yet");
+                throw new RuntimeException(
+                        "No mechanic has been assigned to this request"
+                );
             }
 
             reportedAgainst = serviceRequest.getMechanic().getUser();
 
-        } else {
+        } else if (reportedBy.getRole().equals("MECHANIC")) {
+
+            // Prevent a mechanic from filing against someone else's request.
+            if (serviceRequest.getMechanic() == null
+                    || !serviceRequest.getMechanic().getUser().getId().equals(reportedBy.getId())) {
+                throw new RuntimeException(
+                        "You can only raise complaints for your own service requests"
+                );
+            }
+
+            if (serviceRequest.getCustomer() == null) {
+                throw new RuntimeException(
+                        "No customer is associated with this request"
+                );
+            }
 
             reportedAgainst = serviceRequest.getCustomer();
+
+        } else {
+
+            throw new RuntimeException(
+                    "Only customers and mechanics can raise complaints"
+            );
         }
 
         Complaint complaint = new Complaint();
@@ -70,9 +131,11 @@ public class ComplaintService {
 
         return complaintRepository.save(complaint);
     }
+
     public List<Complaint> getMyComplaints() {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
@@ -80,6 +143,7 @@ public class ComplaintService {
 
         return complaintRepository.findByReportedBy(user);
     }
+
     public List<ComplaintSummaryResponse> getAllComplaints() {
 
         List<Complaint> complaints = complaintRepository.findAll();
@@ -108,6 +172,7 @@ public class ComplaintService {
 
         }).toList();
     }
+
     public Complaint resolveComplaint(Long complaintId) {
 
         Complaint complaint = complaintRepository.findById(complaintId)
@@ -115,8 +180,25 @@ public class ComplaintService {
 
         complaint.setStatus("RESOLVED");
 
-        return complaintRepository.save(complaint);
+        Complaint savedComplaint = complaintRepository.save(complaint);
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        User admin = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("Admin user not found"));
+
+        systemLogService.log(
+                admin,
+                "COMPLAINT_RESOLVED",
+                "COMPLAINT",
+                complaintId,
+                "Complaint resolved"
+        );
+
+        return savedComplaint;
     }
+
     public Complaint rejectComplaint(Long complaintId) {
 
         Complaint complaint = complaintRepository.findById(complaintId)
@@ -124,6 +206,22 @@ public class ComplaintService {
 
         complaint.setStatus("REJECTED");
 
-        return complaintRepository.save(complaint);
+        Complaint savedComplaint = complaintRepository.save(complaint);
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        User admin = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("Admin user not found"));
+
+        systemLogService.log(
+                admin,
+                "COMPLAINT_REJECTED",
+                "COMPLAINT",
+                complaintId,
+                "Complaint rejected"
+        );
+
+        return savedComplaint;
     }
 }

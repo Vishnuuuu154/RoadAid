@@ -27,3 +27,13 @@ export const logout = () => {
 export const isAuthenticated = () => {
     return getUser() !== null;
 };
+export const forgotPassword = (email) => {
+    return api.post("/users/forgot-password", { email });
+};
+
+export const resetPassword = (token, newPassword) => {
+    return api.post("/users/reset-password", {
+        token,
+        newPassword,
+    });
+};

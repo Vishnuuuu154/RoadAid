@@ -39,4 +39,9 @@ public class ReviewController {
 
         return reviewService.getAverageRating(mechanicId);
     }
+    @GetMapping("/admin")
+    public List<Review> getAllReviews() {
+
+        return reviewService.getAllReviews();
+    }
 }

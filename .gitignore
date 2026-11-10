@@ -22,3 +22,39 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Spring Boot local configuration
+**/application-local.properties
+**/application-local.yml
+**/application-local.yaml
+
+# Maven build output
+**/target/
+
+# Node.js dependencies
+**/node_modules/
+
+# Vite build output
+**/dist/
+
+# IDE settings
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Application logs
+error-log.txt
+**/error-log.txt
+
+# User-uploaded files
+backend/uploads/
+uploads/

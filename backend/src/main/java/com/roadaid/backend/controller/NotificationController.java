@@ -36,4 +36,8 @@ public class NotificationController {
     public void deleteNotification(@PathVariable Long id) {
         notificationService.deleteNotification(id);
     }
+    @PutMapping("/read-all")
+    public int markAllAsRead() {
+        return notificationService.markAllAsRead();
+    }
 }

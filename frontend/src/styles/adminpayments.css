@@ -1,0 +1,680 @@
+/* ==========================================================================
+   Admin: Payments
+   Calm, spacious layout. Same ink + amber set as the other admin pages.
+   Classes use the ap- prefix and live under .ap-root.
+   ========================================================================== */
+
+.ap-root {
+    --ap-ink: #181b24;
+    --ap-text: #3b4150;
+    --ap-muted: #6b7280;
+    --ap-line: #e8eaee;
+    --ap-line-soft: #f1f2f5;
+    --ap-surface: #ffffff;
+    --ap-field: #f6f7f9;
+    --ap-accent: #e8912a;
+    --ap-accent-strong: #b8650a;
+    --ap-red: #c0392b;
+    --ap-red-soft: #fdecea;
+    --ap-red-line: #f5c6c8;
+
+    --ap-cols: 130px minmax(0, 1.3fr) minmax(0, 1fr) 100px 130px 140px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ap-text);
+    font-feature-settings: "tnum" 1;
+}
+
+.ap-root *,
+.ap-root *::before,
+.ap-root *::after {
+    box-sizing: border-box;
+}
+
+.ap-root h1,
+.ap-root h2,
+.ap-root p {
+    margin: 0;
+    padding: 0;
+}
+
+.ap-root button,
+.ap-root input,
+.ap-root select {
+    font-family: inherit;
+}
+
+.ap-root :focus-visible {
+    outline: 3px solid rgba(232, 145, 42, 0.6);
+    outline-offset: 2px;
+}
+
+/* ---------- Header ---------- */
+
+.ap-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.ap-title {
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ap-ink);
+}
+
+.ap-sub {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--ap-muted);
+}
+
+.ap-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.ap-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ap-ink);
+    background: var(--ap-surface);
+    border: 1px solid var(--ap-line);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.ap-btn:hover:not(:disabled) {
+    background: var(--ap-field);
+}
+
+.ap-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ap-spin {
+    animation: ap-rotate 0.8s linear infinite;
+}
+
+@keyframes ap-rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ---------- Error ---------- */
+
+.ap-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--ap-red);
+    background: var(--ap-red-soft);
+    border: 1px solid var(--ap-red-line);
+    border-radius: 12px;
+}
+
+.ap-error span {
+    flex: 1;
+}
+
+.ap-error button {
+    padding: 6px 12px;
+    font-weight: 700;
+    color: var(--ap-red);
+    background: #fff;
+    border: 1px solid var(--ap-red-line);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* ---------- Summary ---------- */
+
+.ap-stats {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 16px;
+}
+
+.ap-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 20px 22px;
+    background: var(--ap-surface);
+    border: 1px solid var(--ap-line);
+    border-radius: 16px;
+}
+
+.ap-stat-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ap-muted);
+}
+
+.ap-stat strong {
+    font-size: 26px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ap-ink);
+}
+
+.ap-stat-note {
+    min-height: 20px;
+    font-size: 13px;
+    color: var(--ap-muted);
+}
+
+.ap-stat-main {
+    color: #fff;
+    background: var(--ap-ink);
+    border-color: var(--ap-ink);
+}
+
+.ap-stat-main .ap-stat-label,
+.ap-stat-main .ap-stat-note {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.ap-stat-main strong {
+    color: #fff;
+}
+
+/* ---------- Status tabs (underline style) ---------- */
+
+.ap-tabs {
+    display: flex;
+    gap: 28px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--ap-line);
+    scrollbar-width: none;
+}
+
+.ap-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.ap-tab {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 0 14px;
+    margin-bottom: -1px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ap-muted);
+    background: none;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+}
+
+.ap-tab span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #9aa0ab;
+}
+
+.ap-tab:hover {
+    color: var(--ap-ink);
+}
+
+.ap-tab[aria-pressed="true"] {
+    font-weight: 800;
+    color: var(--ap-ink);
+    border-bottom-color: var(--ap-accent);
+}
+
+.ap-tab[aria-pressed="true"] span {
+    color: var(--ap-accent-strong);
+}
+
+/* ---------- Filters ---------- */
+
+.ap-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.ap-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 280px;
+    max-width: 460px;
+    min-height: 44px;
+    padding: 0 8px 0 14px;
+    color: var(--ap-muted);
+    background: var(--ap-surface);
+    border: 1px solid var(--ap-line);
+    border-radius: 12px;
+}
+
+.ap-search:focus-within {
+    border-color: var(--ap-accent);
+}
+
+.ap-search input {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    color: var(--ap-ink);
+    background: transparent;
+    border: 0;
+    outline: 0;
+}
+
+.ap-clear {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ap-muted);
+    background: var(--ap-line-soft);
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.ap-select {
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ap-ink);
+    background: var(--ap-surface);
+    border: 1px solid var(--ap-line);
+    border-radius: 12px;
+}
+
+.ap-link-btn {
+    padding: 8px 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ap-accent-strong);
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+.ap-link-btn:hover {
+    text-decoration: underline;
+}
+
+/* ---------- List ---------- */
+
+.ap-list {
+    overflow: hidden;
+    background: var(--ap-surface);
+    border: 1px solid var(--ap-line);
+    border-radius: 16px;
+}
+
+.ap-head,
+.ap-row {
+    display: grid;
+    grid-template-columns: var(--ap-cols);
+    align-items: center;
+    gap: 20px;
+    padding: 0 24px;
+}
+
+.ap-head {
+    min-height: 46px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #9aa0ab;
+    border-bottom: 1px solid var(--ap-line);
+}
+
+.ap-right {
+    text-align: right;
+}
+
+.ap-row {
+    min-height: 68px;
+    color: var(--ap-text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ap-line-soft);
+    transition: background 0.12s;
+}
+
+a.ap-row-link {
+    cursor: pointer;
+}
+
+a.ap-row-link:hover {
+    background: #fafafb;
+}
+
+.ap-row > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ap-id,
+.ap-person {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.35;
+}
+
+.ap-id b {
+    font-weight: 800;
+    color: var(--ap-ink);
+}
+
+.ap-person b {
+    font-weight: 700;
+    color: var(--ap-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ap-id small,
+.ap-person small {
+    font-size: 12px;
+    color: var(--ap-muted);
+}
+
+.ap-muted em {
+    font-style: normal;
+    color: #9aa0ab;
+}
+
+.ap-amount {
+    font-weight: 800;
+    text-align: right;
+    color: var(--ap-ink);
+}
+
+.ap-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 24px;
+    font-size: 14px;
+    color: var(--ap-muted);
+    background: var(--ap-field);
+}
+
+.ap-foot strong {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--ap-ink);
+}
+
+/* ---------- Status ---------- */
+
+.ap-status {
+    --tone: #6b7280;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ap-ink);
+}
+
+.ap-status i {
+    width: 9px;
+    height: 9px;
+    flex-shrink: 0;
+    background: var(--tone);
+    border-radius: 50%;
+}
+
+.ap-status[data-tone="amber"] { --tone: #e8912a; }
+.ap-status[data-tone="green"] { --tone: #1f9d63; }
+.ap-status[data-tone="red"] { --tone: #d6393f; }
+
+/* ---------- Show more ---------- */
+
+.ap-more {
+    align-self: center;
+    min-height: 42px;
+    padding: 0 22px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ap-ink);
+    background: var(--ap-surface);
+    border: 1px solid var(--ap-line);
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.ap-more span {
+    font-weight: 500;
+    color: var(--ap-muted);
+}
+
+.ap-more:hover {
+    background: var(--ap-field);
+}
+
+/* ---------- Empty states ---------- */
+
+.ap-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 64px 20px;
+    text-align: center;
+    background: var(--ap-surface);
+    border: 1px solid var(--ap-line);
+    border-radius: 16px;
+}
+
+.ap-empty h2 {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--ap-ink);
+}
+
+.ap-empty p {
+    margin-bottom: 6px;
+    color: var(--ap-muted);
+}
+
+.ap-empty-icon {
+    width: 64px;
+    height: 64px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: var(--ap-muted);
+    background: var(--ap-field);
+    border-radius: 50%;
+}
+
+/* ---------- Skeleton ---------- */
+
+.ap-skel-row {
+    grid-template-columns: 130px minmax(0, 1fr) 140px;
+}
+
+.ap-skel {
+    display: block;
+    height: 16px;
+    background: linear-gradient(90deg, var(--ap-line-soft) 25%, var(--ap-line) 50%, var(--ap-line-soft) 75%);
+    background-size: 200% 100%;
+    border-radius: 8px;
+    animation: ap-shimmer 1.3s ease-in-out infinite;
+}
+
+@keyframes ap-shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+/* ---------- Narrower screens ---------- */
+
+@media (max-width: 1000px) {
+    /* The mechanic column drops out so nothing gets squeezed. */
+    .ap-root {
+        --ap-cols: 120px minmax(0, 1.2fr) 100px 120px 130px;
+    }
+
+    .ap-head span:nth-child(3),
+    .ap-row > span:nth-child(3) {
+        display: none;
+    }
+
+    .ap-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ap-stat-main {
+        grid-column: 1 / -1;
+    }
+}
+
+/* ---------- Phones: one tidy card per payment ---------- */
+
+@media (max-width: 700px) {
+    .ap-root {
+        gap: 20px;
+    }
+
+    .ap-title {
+        font-size: 24px;
+    }
+
+    .ap-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .ap-tabs {
+        gap: 22px;
+    }
+
+    .ap-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow: visible;
+        background: none;
+        border: 0;
+    }
+
+    .ap-head {
+        display: none;
+    }
+
+    .ap-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 4px 12px;
+        min-height: 0;
+        padding: 16px;
+        background: var(--ap-surface);
+        border: 1px solid var(--ap-line);
+        border-radius: 14px;
+    }
+
+    .ap-row > span {
+        white-space: normal;
+    }
+
+    /* amount on the right of the first line, then customer, then details */
+    .ap-row .ap-id {
+        grid-column: 1;
+        grid-row: 1;
+        flex-direction: row;
+        align-items: baseline;
+        gap: 8px;
+    }
+
+    .ap-row .ap-amount {
+        grid-column: 2;
+        grid-row: 1;
+        font-size: 17px;
+    }
+
+    .ap-row .ap-person {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    .ap-row .ap-person b {
+        font-size: 16px;
+    }
+
+    .ap-row > span:nth-child(3) {
+        display: block;
+        grid-column: 1;
+        grid-row: 3;
+        font-size: 14px;
+        color: var(--ap-muted);
+    }
+
+    .ap-row > span:nth-child(4) {
+        grid-column: 1;
+        grid-row: 4;
+        font-size: 14px;
+        color: var(--ap-muted);
+    }
+
+    .ap-row .ap-status {
+        grid-column: 2;
+        grid-row: 3 / span 2;
+        align-self: end;
+    }
+
+    .ap-foot {
+        border-radius: 14px;
+    }
+
+    .ap-search {
+        max-width: none;
+    }
+
+    .ap-select {
+        flex: 1;
+    }
+
+    .ap-skel-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ap-spin,
+    .ap-skel {
+        animation: none;
+    }
+
+    .ap-row {
+        transition: none;
+    }
+}

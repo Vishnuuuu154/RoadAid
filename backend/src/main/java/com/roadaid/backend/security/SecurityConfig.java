@@ -12,12 +12,13 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
-
+import org.springframework.beans.factory.annotation.Value;
 @Configuration
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
+    @Value("${app.cors.allowed-origins:http://localhost:5173}")
+    private List<String> allowedOrigins;
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
@@ -36,8 +37,13 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers(
                                 "/api/users/register",
-                                "/api/users/login"
+                                "/api/users/login",
+                                "/api/users/forgot-password",
+                                "/api/users/reset-password",
+                                "/api/towing-providers/register",
+                                "/actuator/health"
                         ).permitAll()
+
 
                         .requestMatchers(
                                 "/v3/api-docs/**",
@@ -52,7 +58,8 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/api/mechanics/search")
                         .hasAnyRole("CUSTOMER", "MECHANIC")
-
+                        .requestMatchers("/api/towing-providers/**")
+                        .hasRole("TOWING_PROVIDER")
                         .requestMatchers("/api/mechanics/me")
                         .hasRole("MECHANIC")
                         .requestMatchers("/api/mechanics/requests")
@@ -69,21 +76,30 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/api/quotations/**")
                         .hasAnyRole("MECHANIC", "CUSTOMER")
-
+                        .requestMatchers("/uploads/request-images/**").permitAll()
                         .requestMatchers("/api/customer/**")
                         .hasRole("CUSTOMER")
-
+                        .requestMatchers("/api/payments/cash/*/confirm")
+                        .hasRole("MECHANIC")
+                        .requestMatchers(HttpMethod.GET, "/api/payments/my")
+                        .hasAnyRole("CUSTOMER", "MECHANIC")
                         .requestMatchers("/api/payments/**")
                         .hasRole("CUSTOMER")
+                        .requestMatchers("/api/reviews/admin").hasRole("ADMIN")
 
-                        .requestMatchers("/api/reviews/**")
+                        .requestMatchers(HttpMethod.POST, "/api/reviews/**")
                         .hasRole("CUSTOMER")
+
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/**")
+                        .hasAnyRole("CUSTOMER", "MECHANIC")
 
                         .requestMatchers("/api/favorites/**")
                         .hasRole("CUSTOMER")
 
                         .requestMatchers("/api/notifications/**")
                         .authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/map/fuel-stations")
+                        .hasAnyRole("CUSTOMER", "MECHANIC")
 
                         .anyRequest().authenticated()
                 )
@@ -99,9 +115,7 @@ public class SecurityConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
-                List.of("http://localhost:5173")
-        );
+        configuration.setAllowedOrigins(allowedOrigins);
 
         configuration.setAllowedMethods(
                 List.of("GET", "POST", "PUT","PATCH", "DELETE", "OPTIONS")

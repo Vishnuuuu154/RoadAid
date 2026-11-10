@@ -1,0 +1,474 @@
+/* ==========================================================================
+   Admin: System Logs
+   A calm day-by-day activity feed. Same ink + amber set as the other admin
+   pages. Classes use the sl- prefix and live under .sl-root.
+   ========================================================================== */
+
+.sl-root {
+    --sl-ink: #181b24;
+    --sl-text: #3b4150;
+    --sl-muted: #6b7280;
+    --sl-line: #e8eaee;
+    --sl-line-soft: #f1f2f5;
+    --sl-surface: #ffffff;
+    --sl-field: #f6f7f9;
+    --sl-accent: #e8912a;
+    --sl-accent-strong: #b8650a;
+    --sl-red: #c0392b;
+    --sl-red-soft: #fdecea;
+    --sl-red-line: #f5c6c8;
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--sl-text);
+    font-feature-settings: "tnum" 1;
+}
+
+.sl-root *,
+.sl-root *::before,
+.sl-root *::after {
+    box-sizing: border-box;
+}
+
+.sl-root h1,
+.sl-root h2,
+.sl-root p,
+.sl-root ul {
+    margin: 0;
+    padding: 0;
+}
+
+.sl-root ul {
+    list-style: none;
+}
+
+.sl-root button,
+.sl-root input,
+.sl-root select {
+    font-family: inherit;
+}
+
+.sl-root :focus-visible {
+    outline: 3px solid rgba(232, 145, 42, 0.6);
+    outline-offset: 2px;
+}
+
+/* ---------- Header ---------- */
+
+.sl-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.sl-title-main {
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--sl-ink);
+}
+
+.sl-sub {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--sl-muted);
+}
+
+.sl-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.sl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--sl-ink);
+    background: var(--sl-surface);
+    border: 1px solid var(--sl-line);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.sl-btn:hover:not(:disabled) {
+    background: var(--sl-field);
+}
+
+.sl-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.sl-spin {
+    animation: sl-rotate 0.8s linear infinite;
+}
+
+@keyframes sl-rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ---------- Error ---------- */
+
+.sl-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--sl-red);
+    background: var(--sl-red-soft);
+    border: 1px solid var(--sl-red-line);
+    border-radius: 12px;
+}
+
+.sl-error span {
+    flex: 1;
+}
+
+.sl-error button {
+    padding: 6px 12px;
+    font-weight: 700;
+    color: var(--sl-red);
+    background: #fff;
+    border: 1px solid var(--sl-red-line);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* ---------- Filters ---------- */
+
+.sl-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.sl-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 280px;
+    max-width: 460px;
+    min-height: 44px;
+    padding: 0 8px 0 14px;
+    color: var(--sl-muted);
+    background: var(--sl-surface);
+    border: 1px solid var(--sl-line);
+    border-radius: 12px;
+}
+
+.sl-search:focus-within {
+    border-color: var(--sl-accent);
+}
+
+.sl-search input {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    color: var(--sl-ink);
+    background: transparent;
+    border: 0;
+    outline: 0;
+}
+
+.sl-clear {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sl-muted);
+    background: var(--sl-line-soft);
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.sl-select {
+    min-height: 44px;
+    max-width: 100%;
+    padding: 0 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sl-ink);
+    background: var(--sl-surface);
+    border: 1px solid var(--sl-line);
+    border-radius: 12px;
+}
+
+.sl-link-btn {
+    padding: 8px 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--sl-accent-strong);
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+.sl-link-btn:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Feed ---------- */
+
+.sl-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.sl-day-label {
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--sl-muted);
+}
+
+.sl-card {
+    overflow: hidden;
+    background: var(--sl-surface);
+    border: 1px solid var(--sl-line);
+    border-radius: 16px;
+}
+
+.sl-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 18px 22px;
+}
+
+.sl-entry + .sl-entry {
+    border-top: 1px solid var(--sl-line-soft);
+}
+
+.sl-icon {
+    --tone: #6b7280;
+    --tone-soft: #f1f2f5;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--tone);
+    background: var(--tone-soft);
+    border-radius: 50%;
+}
+
+.sl-icon[data-tone="green"] { --tone: #17794c; --tone-soft: #e9f7f0; }
+.sl-icon[data-tone="red"] { --tone: #c0392b; --tone-soft: #fdecea; }
+
+.sl-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.sl-title {
+    font-weight: 800;
+    color: var(--sl-ink);
+}
+
+.sl-desc {
+    margin-top: 2px;
+    color: var(--sl-text);
+    overflow-wrap: anywhere;
+}
+
+.sl-meta {
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--sl-muted);
+    overflow-wrap: anywhere;
+}
+
+.sl-side {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    text-align: right;
+}
+
+.sl-side time {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sl-muted);
+}
+
+.sl-target {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--sl-accent-strong);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+a.sl-target:hover {
+    text-decoration: underline;
+}
+
+.sl-target-plain {
+    color: var(--sl-muted);
+    font-weight: 600;
+}
+
+/* ---------- Show more ---------- */
+
+.sl-more {
+    align-self: center;
+    min-height: 42px;
+    padding: 0 22px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--sl-ink);
+    background: var(--sl-surface);
+    border: 1px solid var(--sl-line);
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.sl-more span {
+    font-weight: 500;
+    color: var(--sl-muted);
+}
+
+.sl-more:hover {
+    background: var(--sl-field);
+}
+
+/* ---------- Empty states ---------- */
+
+.sl-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 64px 20px;
+    text-align: center;
+    background: var(--sl-surface);
+    border: 1px solid var(--sl-line);
+    border-radius: 16px;
+}
+
+.sl-empty h2 {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--sl-ink);
+}
+
+.sl-empty p {
+    margin-bottom: 6px;
+    color: var(--sl-muted);
+}
+
+.sl-empty-icon {
+    width: 64px;
+    height: 64px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: var(--sl-muted);
+    background: var(--sl-field);
+    border-radius: 50%;
+}
+
+/* ---------- Skeleton ---------- */
+
+.sl-skel {
+    display: block;
+    height: 14px;
+    background: linear-gradient(90deg, var(--sl-line-soft) 25%, var(--sl-line) 50%, var(--sl-line-soft) 75%);
+    background-size: 200% 100%;
+    border-radius: 8px;
+    animation: sl-shimmer 1.3s ease-in-out infinite;
+}
+
+.sl-skel-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+.sl-skel-line + .sl-skel-line {
+    margin-top: 8px;
+}
+
+.sl-skel-short {
+    width: 55%;
+}
+
+@keyframes sl-shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+/* ---------- Phones ---------- */
+
+@media (max-width: 700px) {
+    .sl-root {
+        gap: 20px;
+    }
+
+    .sl-title-main {
+        font-size: 24px;
+    }
+
+    .sl-entry {
+        flex-wrap: wrap;
+        gap: 10px 14px;
+        padding: 16px;
+    }
+
+    /* The time and target drop under the text, lined up with it. */
+    .sl-side {
+        flex-basis: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding-left: 54px;
+        text-align: left;
+    }
+
+    .sl-search {
+        max-width: none;
+    }
+
+    .sl-select {
+        flex: 1;
+    }
+
+    .sl-email {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sl-spin,
+    .sl-skel {
+        animation: none;
+    }
+}

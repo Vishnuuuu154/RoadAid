@@ -1,0 +1,576 @@
+/* ==========================================================================
+   Admin: Service Requests list
+   Calm, spacious layout. Same ink + amber set as the other admin pages.
+   Classes use the rq- prefix and live under .rq-root.
+   ========================================================================== */
+
+.rq-root {
+    --rq-ink: #181b24;
+    --rq-text: #3b4150;
+    --rq-muted: #6b7280;
+    --rq-line: #e8eaee;
+    --rq-line-soft: #f1f2f5;
+    --rq-surface: #ffffff;
+    --rq-field: #f6f7f9;
+    --rq-accent: #e8912a;
+    --rq-accent-strong: #b8650a;
+    --rq-red: #c0392b;
+    --rq-red-soft: #fdecea;
+    --rq-red-line: #f5c6c8;
+
+    --rq-cols: 140px minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) 150px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--rq-text);
+    font-feature-settings: "tnum" 1;
+}
+
+.rq-root *,
+.rq-root *::before,
+.rq-root *::after {
+    box-sizing: border-box;
+}
+
+.rq-root h1,
+.rq-root h2,
+.rq-root p {
+    margin: 0;
+    padding: 0;
+}
+
+.rq-root button,
+.rq-root input,
+.rq-root select {
+    font-family: inherit;
+}
+
+.rq-root :focus-visible {
+    outline: 3px solid rgba(232, 145, 42, 0.6);
+    outline-offset: 2px;
+}
+
+/* ---------- Header ---------- */
+
+.rq-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.rq-title {
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--rq-ink);
+}
+
+.rq-sub {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--rq-muted);
+}
+
+.rq-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.rq-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--rq-ink);
+    background: var(--rq-surface);
+    border: 1px solid var(--rq-line);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.rq-btn:hover:not(:disabled) {
+    background: var(--rq-field);
+}
+
+.rq-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.rq-spin {
+    animation: rq-rotate 0.8s linear infinite;
+}
+
+@keyframes rq-rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ---------- Error ---------- */
+
+.rq-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--rq-red);
+    background: var(--rq-red-soft);
+    border: 1px solid var(--rq-red-line);
+    border-radius: 12px;
+}
+
+.rq-error span {
+    flex: 1;
+}
+
+.rq-error button {
+    padding: 6px 12px;
+    font-weight: 700;
+    color: var(--rq-red);
+    background: #fff;
+    border: 1px solid var(--rq-red-line);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* ---------- Status tabs (underline style) ---------- */
+
+.rq-tabs {
+    display: flex;
+    gap: 28px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--rq-line);
+    scrollbar-width: none;
+}
+
+.rq-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.rq-tab {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 0 14px;
+    margin-bottom: -1px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--rq-muted);
+    background: none;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+}
+
+.rq-tab span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #9aa0ab;
+}
+
+.rq-tab:hover {
+    color: var(--rq-ink);
+}
+
+.rq-tab[aria-pressed="true"] {
+    font-weight: 800;
+    color: var(--rq-ink);
+    border-bottom-color: var(--rq-accent);
+}
+
+.rq-tab[aria-pressed="true"] span {
+    color: var(--rq-accent-strong);
+}
+
+/* ---------- Filters ---------- */
+
+.rq-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.rq-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 280px;
+    max-width: 460px;
+    min-height: 44px;
+    padding: 0 8px 0 14px;
+    color: var(--rq-muted);
+    background: var(--rq-surface);
+    border: 1px solid var(--rq-line);
+    border-radius: 12px;
+}
+
+.rq-search:focus-within {
+    border-color: var(--rq-accent);
+}
+
+.rq-search input {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    color: var(--rq-ink);
+    background: transparent;
+    border: 0;
+    outline: 0;
+}
+
+.rq-clear {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--rq-muted);
+    background: var(--rq-line-soft);
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.rq-select {
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--rq-ink);
+    background: var(--rq-surface);
+    border: 1px solid var(--rq-line);
+    border-radius: 12px;
+}
+
+.rq-link-btn {
+    padding: 8px 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--rq-accent-strong);
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+.rq-link-btn:hover {
+    text-decoration: underline;
+}
+
+/* ---------- List ---------- */
+
+.rq-list {
+    overflow: hidden;
+    background: var(--rq-surface);
+    border: 1px solid var(--rq-line);
+    border-radius: 16px;
+}
+
+.rq-head,
+.rq-row {
+    display: grid;
+    grid-template-columns: var(--rq-cols);
+    align-items: center;
+    gap: 20px;
+    padding: 0 24px;
+}
+
+.rq-head {
+    min-height: 46px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #9aa0ab;
+    border-bottom: 1px solid var(--rq-line);
+}
+
+.rq-row {
+    min-height: 68px;
+    color: var(--rq-text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rq-line-soft);
+    transition: background 0.12s;
+}
+
+.rq-row:last-child {
+    border-bottom: 0;
+}
+
+a.rq-row:hover {
+    background: #fafafb;
+}
+
+.rq-row > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rq-id {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.35;
+}
+
+.rq-id b {
+    font-weight: 800;
+    color: var(--rq-ink);
+}
+
+.rq-id small {
+    font-size: 12px;
+    color: var(--rq-muted);
+}
+
+.rq-customer {
+    font-weight: 700;
+    color: var(--rq-ink);
+}
+
+.rq-muted {
+    color: var(--rq-text);
+}
+
+.rq-muted em {
+    font-style: normal;
+    color: #9aa0ab;
+}
+
+/* ---------- Status ---------- */
+
+.rq-status {
+    --tone: #6b7280;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--rq-ink);
+}
+
+.rq-status i {
+    width: 9px;
+    height: 9px;
+    flex-shrink: 0;
+    background: var(--tone);
+    border-radius: 50%;
+}
+
+.rq-status[data-tone="amber"] { --tone: #e8912a; }
+.rq-status[data-tone="blue"] { --tone: #3b6fd8; }
+.rq-status[data-tone="purple"] { --tone: #6d5bd0; }
+.rq-status[data-tone="green"] { --tone: #1f9d63; }
+.rq-status[data-tone="red"] { --tone: #d6393f; }
+
+/* ---------- Show more ---------- */
+
+.rq-more {
+    align-self: center;
+    min-height: 42px;
+    padding: 0 22px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--rq-ink);
+    background: var(--rq-surface);
+    border: 1px solid var(--rq-line);
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.rq-more span {
+    font-weight: 500;
+    color: var(--rq-muted);
+}
+
+.rq-more:hover {
+    background: var(--rq-field);
+}
+
+/* ---------- Empty states ---------- */
+
+.rq-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 64px 20px;
+    text-align: center;
+    background: var(--rq-surface);
+    border: 1px solid var(--rq-line);
+    border-radius: 16px;
+}
+
+.rq-empty h2 {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--rq-ink);
+}
+
+.rq-empty p {
+    margin-bottom: 6px;
+    color: var(--rq-muted);
+}
+
+.rq-empty-icon {
+    width: 64px;
+    height: 64px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: var(--rq-muted);
+    background: var(--rq-field);
+    border-radius: 50%;
+}
+
+/* ---------- Skeleton ---------- */
+
+.rq-skel-row {
+    grid-template-columns: 140px minmax(0, 1fr) 150px;
+}
+
+.rq-skel {
+    display: block;
+    height: 16px;
+    background: linear-gradient(90deg, var(--rq-line-soft) 25%, var(--rq-line) 50%, var(--rq-line-soft) 75%);
+    background-size: 200% 100%;
+    border-radius: 8px;
+    animation: rq-shimmer 1.3s ease-in-out infinite;
+}
+
+@keyframes rq-shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+/* ---------- Narrower screens ---------- */
+
+@media (max-width: 1000px) {
+    /* The vehicle moves under the customer so nothing gets squeezed. */
+    .rq-root {
+        --rq-cols: 120px minmax(0, 1.2fr) minmax(0, 1fr) 140px;
+    }
+
+    .rq-head span:nth-child(4),
+    .rq-row > span:nth-child(4) {
+        display: none;
+    }
+}
+
+/* ---------- Phones: one tidy card per request ---------- */
+
+@media (max-width: 700px) {
+    .rq-root {
+        gap: 20px;
+    }
+
+    .rq-title {
+        font-size: 24px;
+    }
+
+    .rq-tabs {
+        gap: 22px;
+    }
+
+    .rq-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow: visible;
+        background: none;
+        border: 0;
+    }
+
+    .rq-head {
+        display: none;
+    }
+
+    .rq-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 4px 12px;
+        min-height: 0;
+        padding: 16px;
+        background: var(--rq-surface);
+        border: 1px solid var(--rq-line) !important;
+        border-radius: 14px;
+    }
+
+    .rq-row > span {
+        white-space: normal;
+    }
+
+    /* id + date on the left, status on the right, then customer, then provider */
+    .rq-row .rq-id {
+        grid-column: 1;
+        grid-row: 1;
+        flex-direction: row;
+        align-items: baseline;
+        gap: 8px;
+    }
+
+    .rq-row .rq-status {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .rq-row .rq-customer {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        font-size: 16px;
+    }
+
+    .rq-row > span:nth-child(3) {
+        grid-column: 1 / -1;
+        grid-row: 3;
+        font-size: 14px;
+        color: var(--rq-muted);
+    }
+
+    .rq-row > span:nth-child(4) {
+        display: block;
+        grid-column: 1 / -1;
+        grid-row: 4;
+        font-size: 14px;
+        color: var(--rq-muted);
+    }
+
+    .rq-search {
+        max-width: none;
+    }
+
+    .rq-select {
+        flex: 1;
+    }
+
+    .rq-skel-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rq-spin,
+    .rq-skel {
+        animation: none;
+    }
+
+    .rq-row {
+        transition: none;
+    }
+}

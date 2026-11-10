@@ -1,237 +1,93 @@
-import { useEffect, useState } from "react";
 import AdminLayout from "../../layouts/AdminLayout";
-import {
-    getUsers,
-    activateUser,
-    deactivateUser
-} from "../../services/adminService";
+import { useNavigate } from "react-router-dom";
 
 function Users() {
-
-    const [users, setUsers] = useState([]);
-    const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        loadUsers();
-    }, []);
-    const handleActivate = async (id) => {
-        if (!window.confirm("activate this user?")) {
-            return;
-        }
-        try {
-
-            await activateUser(id);
-
-            loadUsers();
-
-        } catch (error) {
-
-            console.error(error);
-
-            alert("Failed to activate user.");
-
-        }
-
-    };
-
-    const handleDeactivate = async (id) => {
-        if (!window.confirm("Deactivate this user?")) {
-            return;
-        }
-        try {
-
-            await deactivateUser(id);
-
-            loadUsers();
-
-        } catch (error) {
-
-            console.error(error);
-
-            alert(
-                error.response?.data?.message || "Failed to deactivate user."
-            );
-
-        }
-
-    };
-
-    const loadUsers = async () => {
-
-        try {
-
-            const response = await getUsers(search);
-
-            setUsers(response.data);
-
-        } catch (error) {
-
-            console.error(error);
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
-    const handleSearch = () => {
-        loadUsers();
-    };
+    const navigate = useNavigate();
 
     return (
-
         <AdminLayout>
+            <div className="container-fluid">
+                <h2 className="mb-2">User Management</h2>
+                <p className="text-muted mb-4">
+                    Manage customers, mechanics, and other service providers.
+                </p>
 
-            <h2 className="mb-4">
+                <div className="row g-4">
 
-                User Management
-
-            </h2>
-
-            <div className="d-flex mb-3">
-
-                <input
-                    type="text"
-                    className="form-control me-2"
-                    placeholder="Search by name or email..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onKeyDown={(e) => {
-
-                        if (e.key === "Enter") {
-
-                            handleSearch();
-
-                        }
-
-                    }}
-                />
-
-                <button
-                    className="btn btn-primary"
-                    onClick={handleSearch}
-                >
-                    Search
-                </button>
-
-            </div>
-
-            {loading ? (
-
-                <div className="text-center">
-
-                    <div
-                        className="spinner-border text-primary"
-                        role="status"
-                    >
+                    {/* All Users */}
+                    <div className="col-md-6 col-lg-4">
+                        <div
+                            className="card shadow-sm h-100"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => navigate("/admin/users/all")}
+                        >
+                            <div className="card-body p-4">
+                                <div className="fs-1 mb-3">👥</div>
+                                <h4>All Users</h4>
+                                <p className="text-muted mb-0">
+                                    View and manage all registered users.
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
-                    <p className="mt-2">
+                    {/* Customers */}
+                    <div className="col-md-6 col-lg-4">
+                        <div
+                            className="card shadow-sm h-100"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => navigate("/admin/users/customers")}
+                        >
+                            <div className="card-body p-4">
+                                <div className="fs-1 mb-3">👤</div>
+                                <h4>Customers</h4>
+                                <p className="text-muted mb-0">
+                                    View customer accounts and their activity.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
-                        Loading users...
+                    {/* Mechanics */}
+                    <div className="col-md-6 col-lg-4">
+                        <div
+                            className="card shadow-sm h-100"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => navigate("/admin/users/mechanics")}
+                        >
+                            <div className="card-body p-4">
+                                <div className="fs-1 mb-3">🔧</div>
+                                <h4>Mechanics</h4>
+                                <p className="text-muted mb-0">
+                                    Manage mechanic and service provider accounts.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
-                    </p>
+                    {/* Towing Providers */}
+                    <div className="col-md-6 col-lg-4">
+                        <div
+                            className="card shadow-sm h-100"
+                            style={{ cursor: "pointer" }}
+                            onClick={() =>
+                                navigate("/admin/users/towing-providers")
+                            }
+                        >
+                            <div className="card-body p-4">
+                                <div className="fs-1 mb-3">🚚</div>
+                                <h4>Towing Providers</h4>
+                                <p className="text-muted mb-0">
+                                    View and manage registered towing provider accounts.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
-
-            ) : (
-
-                <table className="table table-hover align-middle shadow-sm">
-
-                    <thead className="table-dark">
-
-                    <tr>
-
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Action</th>
-
-                    </tr>
-
-                    </thead>
-                    <tbody>
-
-                    {users.length === 0 ? (
-
-                        <tr>
-
-                            <td colSpan="6" className="text-center">
-
-                                No users found.
-
-                            </td>
-
-                        </tr>
-
-                    ) : (
-
-                        users.map((user) => (
-
-                            <tr key={user.id}>
-
-                                <td>{user.id}</td>
-                                <td>{user.fullName}</td>
-                                <td>{user.email}</td>
-                                <td>{user.role}</td>
-                                <td>
-                                    {user.isActive ? (
-                                        <span className="badge bg-success">
-            Active
-        </span>
-                                    ) : (
-                                        <span className="badge bg-danger">
-            Inactive
-        </span>
-                                    )}
-                                </td>
-
-                                <td>
-
-                                    {user.isActive ? (
-
-                                        <button
-                                            className="btn btn-outline-danger btn-sm"
-                                            className="btn btn-outline-success btn-sm"
-                                            onClick={() => handleDeactivate(user.id)}
-                                        >
-                                            Deactivate
-                                        </button>
-
-                                    ) : (
-
-                                        <button
-                                            className="btn btn-success btn-sm"
-                                            onClick={() => handleActivate(user.id)}
-                                        >
-                                            Activate
-                                        </button>
-
-                                    )}
-
-                                </td>
-
-                            </tr>
-
-                        ))
-
-                    )}
-
-                    </tbody>
-
-                </table>
-
-            )}
-
+            </div>
         </AdminLayout>
-
     );
-
 }
 
 export default Users;

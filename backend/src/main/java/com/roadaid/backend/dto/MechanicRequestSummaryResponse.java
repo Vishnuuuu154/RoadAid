@@ -11,6 +11,7 @@ public class MechanicRequestSummaryResponse {
     private String location;
     private String status;
     private LocalDateTime createdAt;
+    private LocalDateTime completedAt;
 
     public Long getRequestId() {
         return requestId;
@@ -66,5 +67,12 @@ public class MechanicRequestSummaryResponse {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(LocalDateTime completedAt) {
+        this.completedAt = completedAt;
     }
 }
