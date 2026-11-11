@@ -41,7 +41,8 @@ public class SecurityConfig {
                                 "/api/users/forgot-password",
                                 "/api/users/reset-password",
                                 "/api/towing-providers/register",
-                                "/actuator/health"
+                                "/actuator/health",
+                                "/actuator/health/**"
                         ).permitAll()
 
 
