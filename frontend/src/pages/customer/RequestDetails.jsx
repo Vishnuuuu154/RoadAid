@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomerLayout from "../../layouts/CustomerLayout";
-import api from "../../services/api";
+import api, { API_BASE_URL } from "../../services/api";
 
 /* ------------------------------------------------------------------ */
 /* Config                                                              */
@@ -9,7 +9,7 @@ import api from "../../services/api";
 
 // Where uploaded images are served from. Move this to an env variable
 // before deploying (it was hard-coded to localhost in the original).
-const FILE_BASE_URL = "http://localhost:8080";
+const FILE_BASE_URL = API_BASE_URL;
 
 const COMPLAINT_WINDOW_DAYS = 7;
 const REFRESH_INTERVAL_MS = 30000;

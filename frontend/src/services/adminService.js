@@ -1,4 +1,4 @@
-import api from "./api";
+import api, { API_BASE_URL } from "./api";
 
 export const getDashboard = () => {
     return api.get("/admin/dashboard");
@@ -160,5 +160,5 @@ export const rejectTowingDocument = (documentId, reason) => {
 };
 
 export const getTowingDocumentUrl = (documentId) => {
-    return `http://localhost:8080/api/admin/towing-documents/${documentId}/view`;
+    return `${API_BASE_URL}/api/admin/towing-documents/${documentId}/view`;
 };
