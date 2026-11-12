@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://road-aid-eta.vercel.app/sitemap.xml
