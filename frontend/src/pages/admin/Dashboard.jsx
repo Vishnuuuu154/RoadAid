@@ -118,15 +118,15 @@ function useNow(interval = 30000) {
 
 function StatCard({ icon: Icon, label, value, hint, to }) {
     return (
-        <Link to={to} className="ad-stat" aria-label={`${label}: ${value}. ${hint}`}>
-            <span className="ad-stat-top">
-                <span className="ad-stat-label">{label}</span>
-                <span className="ad-stat-icon" aria-hidden="true">
+        <Link to={to} className="dsh-stat" aria-label={`${label}: ${value}. ${hint}`}>
+            <span className="dsh-stat-top">
+                <span className="dsh-stat-label">{label}</span>
+                <span className="dsh-stat-icon" aria-hidden="true">
                     <Icon />
                 </span>
             </span>
-            <span className="ad-stat-value">{value}</span>
-            <span className="ad-stat-hint">{hint}</span>
+            <span className="dsh-stat-value">{value}</span>
+            <span className="dsh-stat-hint">{hint}</span>
         </Link>
     );
 }
@@ -134,39 +134,39 @@ function StatCard({ icon: Icon, label, value, hint, to }) {
 function AttentionPanel({ items }) {
     if (items.length === 0) {
         return (
-            <section className="ad-attention" data-state="clear" aria-label="Needs your attention">
-                <span className="ad-attention-icon" aria-hidden="true">
+            <section className="dsh-attention" data-state="clear" aria-label="Needs your attention">
+                <span className="dsh-attention-icon" aria-hidden="true">
                     <FaCheckCircle />
                 </span>
                 <div>
-                    <h2 className="ad-attention-title">All clear</h2>
-                    <p className="ad-attention-text">Nothing needs your attention right now.</p>
+                    <h2 className="dsh-attention-title">All clear</h2>
+                    <p className="dsh-attention-text">Nothing needs your attention right now.</p>
                 </div>
             </section>
         );
     }
 
     return (
-        <section className="ad-attention" data-state="alert" aria-label="Needs your attention">
-            <div className="ad-attention-head">
-                <h2 className="ad-attention-title">Needs your attention</h2>
-                <span className="ad-attention-count">{items.length}</span>
+        <section className="dsh-attention" data-state="alert" aria-label="Needs your attention">
+            <div className="dsh-attention-head">
+                <h2 className="dsh-attention-title">Needs your attention</h2>
+                <span className="dsh-attention-count">{items.length}</span>
             </div>
 
-            <ul className="ad-attention-list">
+            <ul className="dsh-attention-list">
                 {items.map((item) => {
                     const Icon = item.icon;
                     return (
                         <li key={item.key}>
-                            <Link to={item.to} className="ad-attention-item">
-                                <span className="ad-attention-item-icon" aria-hidden="true">
+                            <Link to={item.to} className="dsh-attention-item">
+                                <span className="dsh-attention-item-icon" aria-hidden="true">
                                     <Icon />
                                 </span>
-                                <span className="ad-attention-item-text">
+                                <span className="dsh-attention-item-text">
                                     <strong>{item.title}</strong>
                                     <span>{item.text}</span>
                                 </span>
-                                <span className="ad-attention-cta">
+                                <span className="dsh-attention-cta">
                                     {item.cta} <FaArrowRight aria-hidden="true" />
                                 </span>
                             </Link>
@@ -195,23 +195,23 @@ function StatusPanel({ data }) {
     const cancelRate = percent(data.cancelledRequests, total);
 
     return (
-        <section className="ad-panel" aria-labelledby="ad-status-title">
-            <div className="ad-panel-head">
+        <section className="dsh-panel" aria-labelledby="dsh-status-title">
+            <div className="dsh-panel-head">
                 <div>
-                    <h2 className="ad-panel-title" id="ad-status-title">Request status</h2>
-                    <p className="ad-panel-sub">Where every request stands right now</p>
+                    <h2 className="dsh-panel-title" id="dsh-status-title">Request status</h2>
+                    <p className="dsh-panel-sub">Where every request stands right now</p>
                 </div>
-                <Link to={ROUTES.requests} className="ad-link">
+                <Link to={ROUTES.requests} className="dsh-link">
                     {number(data.totalRequests)} total <FaArrowRight aria-hidden="true" />
                 </Link>
             </div>
 
             {total === 0 ? (
-                <p className="ad-empty">No requests yet. They'll show up here as customers ask for help.</p>
+                <p className="dsh-empty">No requests yet. They'll show up here as customers ask for help.</p>
             ) : (
                 <>
                     <div
-                        className="ad-stack"
+                        className="dsh-stack"
                         role="img"
                         aria-label={`Request status split: ${rows.map((r) => `${r.label} ${r.value}`).join(", ")}`}
                     >
@@ -220,30 +220,30 @@ function StatusPanel({ data }) {
                             .map((r) => (
                                 <span
                                     key={r.key}
-                                    className="ad-stack-seg"
+                                    className="dsh-stack-seg"
                                     style={{ width: `${(r.value / total) * 100}%`, background: r.color }}
                                 />
                             ))}
                     </div>
 
-                    <div className="ad-rates">
-                        <span className="ad-rate" data-tone="good">
+                    <div className="dsh-rates">
+                        <span className="dsh-rate" data-tone="good">
                             <strong>{completionRate}%</strong> completed
                         </span>
-                        <span className="ad-rate" data-tone={cancelRate >= 20 ? "bad" : "neutral"}>
+                        <span className="dsh-rate" data-tone={cancelRate >= 20 ? "bad" : "neutral"}>
                             <strong>{cancelRate}%</strong> cancelled
                         </span>
                     </div>
 
-                    <ul className="ad-status-list">
+                    <ul className="dsh-status-list">
                         {rows.map((r) => (
                             <li key={r.key}>
-                                <Link to={r.to} className="ad-status-row">
-                                    <span className="ad-status-dot" style={{ background: r.color }} aria-hidden="true" />
-                                    <span className="ad-status-label">{r.label}</span>
-                                    <span className="ad-status-pct">{percent(r.value, total)}%</span>
-                                    <strong className="ad-status-value">{number(r.value)}</strong>
-                                    <FaChevronRight className="ad-status-go" aria-hidden="true" />
+                                <Link to={r.to} className="dsh-status-row">
+                                    <span className="dsh-status-dot" style={{ background: r.color }} aria-hidden="true" />
+                                    <span className="dsh-status-label">{r.label}</span>
+                                    <span className="dsh-status-pct">{percent(r.value, total)}%</span>
+                                    <strong className="dsh-status-value">{number(r.value)}</strong>
+                                    <FaChevronRight className="dsh-status-go" aria-hidden="true" />
                                 </Link>
                             </li>
                         ))}
@@ -256,21 +256,21 @@ function StatusPanel({ data }) {
 
 function RevenuePanel({ data }) {
     return (
-        <Link to={ROUTES.payments} className="ad-revenue" aria-label={`Total revenue ${currency(data.totalRevenue)}. View payments`}>
-            <span className="ad-revenue-top">
-                <span className="ad-revenue-label">Total revenue</span>
-                <span className="ad-revenue-icon" aria-hidden="true">
+        <Link to={ROUTES.payments} className="dsh-revenue" aria-label={`Total revenue ${currency(data.totalRevenue)}. View payments`}>
+            <span className="dsh-revenue-top">
+                <span className="dsh-revenue-label">Total revenue</span>
+                <span className="dsh-revenue-icon" aria-hidden="true">
                     <FaRupeeSign />
                 </span>
             </span>
-            <span className="ad-revenue-value">{currency(data.totalRevenue)}</span>
-            <span className="ad-revenue-note">From successful payments</span>
-            <span className="ad-revenue-foot">
+            <span className="dsh-revenue-value">{currency(data.totalRevenue)}</span>
+            <span className="dsh-revenue-note">From successful payments</span>
+            <span className="dsh-revenue-foot">
                 <span>
-                    <span className="ad-revenue-foot-label">Payment transactions</span>
+                    <span className="dsh-revenue-foot-label">Payment transactions</span>
                     <strong>{number(data.totalPayments)}</strong>
                 </span>
-                <span className="ad-revenue-cta">
+                <span className="dsh-revenue-cta">
                     View payments <FaArrowRight aria-hidden="true" />
                 </span>
             </span>
@@ -280,16 +280,16 @@ function RevenuePanel({ data }) {
 
 function ComplaintsPanel({ data }) {
     return (
-        <Link to={ROUTES.complaints} className="ad-complaints" aria-label={`Complaints: ${data.totalComplaints}. View complaints`}>
-            <span className="ad-complaints-top">
-                <span className="ad-complaints-label">Complaints</span>
-                <span className="ad-complaints-icon" aria-hidden="true">
+        <Link to={ROUTES.complaints} className="dsh-complaints" aria-label={`Complaints: ${data.totalComplaints}. View complaints`}>
+            <span className="dsh-complaints-top">
+                <span className="dsh-complaints-label">Complaints</span>
+                <span className="dsh-complaints-icon" aria-hidden="true">
                     <FaCommentDots />
                 </span>
             </span>
-            <span className="ad-complaints-value">{number(data.totalComplaints)}</span>
-            <span className="ad-complaints-note">Total complaints submitted</span>
-            <span className="ad-complaints-cta">
+            <span className="dsh-complaints-value">{number(data.totalComplaints)}</span>
+            <span className="dsh-complaints-note">Total complaints submitted</span>
+            <span className="dsh-complaints-cta">
                 View complaints <FaArrowRight aria-hidden="true" />
             </span>
         </Link>
@@ -298,17 +298,17 @@ function ComplaintsPanel({ data }) {
 
 function LoadingState() {
     return (
-        <div className="ad-root" aria-busy="true" aria-label="Loading admin dashboard">
-            <div className="ad-skeleton" style={{ height: 56, width: "45%" }} />
-            <div className="ad-skeleton" style={{ height: 96 }} />
-            <div className="ad-stats">
+        <div className="dsh-root" aria-busy="true" aria-label="Loading admin dashboard">
+            <div className="dsh-skeleton" style={{ height: 56, width: "45%" }} />
+            <div className="dsh-skeleton" style={{ height: 96 }} />
+            <div className="dsh-stats">
                 {[0, 1, 2, 3].map((i) => (
-                    <div key={i} className="ad-skeleton" style={{ height: 124 }} />
+                    <div key={i} className="dsh-skeleton" style={{ height: 124 }} />
                 ))}
             </div>
-            <div className="ad-grid">
-                <div className="ad-skeleton" style={{ height: 380 }} />
-                <div className="ad-skeleton" style={{ height: 380 }} />
+            <div className="dsh-grid">
+                <div className="dsh-skeleton" style={{ height: 380 }} />
+                <div className="dsh-skeleton" style={{ height: 380 }} />
             </div>
         </div>
     );
@@ -390,14 +390,14 @@ function DashboardContent() {
     // Nothing to show at all: full error page.
     if (!data) {
         return (
-            <div className="ad-root">
-                <div className="ad-error" role="alert">
-                    <FaExclamationTriangle className="ad-error-icon" aria-hidden="true" />
+            <div className="dsh-root">
+                <div className="dsh-error" role="alert">
+                    <FaExclamationTriangle className="dsh-error-icon" aria-hidden="true" />
                     <div>
-                        <h2 className="ad-error-title">Unable to load dashboard</h2>
-                        <p className="ad-error-text">{error}</p>
-                        <button type="button" className="ad-btn ad-btn-danger" onClick={() => load("refresh")}>
-                            <FaSyncAlt aria-hidden="true" className={refreshing ? "ad-spin" : ""} /> Try again
+                        <h2 className="dsh-error-title">Unable to load dashboard</h2>
+                        <p className="dsh-error-text">{error}</p>
+                        <button type="button" className="dsh-btn dsh-btn-danger" onClick={() => load("refresh")}>
+                            <FaSyncAlt aria-hidden="true" className={refreshing ? "dsh-spin" : ""} /> Try again
                         </button>
                     </div>
                 </div>
@@ -409,42 +409,42 @@ function DashboardContent() {
     const dateLabel = new Date(now).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
 
     return (
-        <div className="ad-root">
+        <div className="dsh-root">
             {/* ------------------------ Header ------------------------ */}
-            <header className="ad-header">
+            <header className="dsh-header">
                 <div>
-                    <p className="ad-eyebrow">{dateLabel}</p>
-                    <h1 className="ad-title">Admin dashboard</h1>
-                    <p className="ad-sub">Monitor RoadAid activity and system performance.</p>
+                    <p className="dsh-eyebrow">{dateLabel}</p>
+                    <h1 className="dsh-title">Admin dashboard</h1>
+                    <p className="dsh-sub">Monitor RoadAid activity and system performance.</p>
                 </div>
 
-                <div className="ad-header-meta">
+                <div className="dsh-header-meta">
                     {lastUpdated && (
-                        <span className="ad-updated" aria-live="polite">
-                            <span className="ad-live-dot" aria-hidden="true" />
+                        <span className="dsh-updated" aria-live="polite">
+                            <span className="dsh-live-dot" aria-hidden="true" />
                             Updated {timeAgo(lastUpdated, now)}
                         </span>
                     )}
                     <button
                         type="button"
-                        className="ad-btn ad-btn-secondary"
+                        className="dsh-btn dsh-btn-secondary"
                         onClick={() => load("refresh")}
                         disabled={refreshing}
                         aria-busy={refreshing}
                     >
-                        <FaSyncAlt aria-hidden="true" className={refreshing ? "ad-spin" : ""} />
+                        <FaSyncAlt aria-hidden="true" className={refreshing ? "dsh-spin" : ""} />
                         <span>{refreshing ? "Refreshing…" : "Refresh"}</span>
                     </button>
                 </div>
             </header>
 
             {error && (
-                <div className="ad-notice" role="alert">
+                <div className="dsh-notice" role="alert">
                     <FaExclamationTriangle aria-hidden="true" />
                     <p>
                         <strong>{error}</strong> Showing the last data we had.
                     </p>
-                    <button type="button" className="ad-btn ad-btn-secondary ad-btn-sm" onClick={() => load("refresh")}>
+                    <button type="button" className="dsh-btn dsh-btn-secondary dsh-btn-sm" onClick={() => load("refresh")}>
                         Try again
                     </button>
                 </div>
@@ -454,7 +454,7 @@ function DashboardContent() {
             <AttentionPanel items={attention} />
 
             {/* ------------------------ Key numbers ------------------------ */}
-            <nav className="ad-stats" aria-label="Key numbers">
+            <nav className="dsh-stats" aria-label="Key numbers">
                 <StatCard
                     icon={FaUsers}
                     label="Customers"
@@ -486,10 +486,10 @@ function DashboardContent() {
             </nav>
 
             {/* ------------------------ Details ------------------------ */}
-            <div className="ad-grid">
+            <div className="dsh-grid">
                 <StatusPanel data={data} />
 
-                <div className="ad-side">
+                <div className="dsh-side">
                     <RevenuePanel data={data} />
                     <ComplaintsPanel data={data} />
                 </div>

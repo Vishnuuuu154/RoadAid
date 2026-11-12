@@ -2,10 +2,10 @@
    Admin Dashboard
    Keeps the admin colour set (ink + amber) used by the sidebar, navbar and
    footer, so this page still looks like part of the same panel.
-   Classes use the ad- prefix. Everything is defined under .ad-root.
+   Classes use the dsh- prefix. Everything is defined under .dsh-root.
    ========================================================================== */
 
-.ad-root {
+.dsh-root {
     --ad-ink: #181b24;
     --ad-text: #3b4150;
     --ad-muted: #616876;
@@ -45,41 +45,41 @@
     font-feature-settings: "tnum" 1;
 }
 
-.ad-root *,
-.ad-root *::before,
-.ad-root *::after {
+.dsh-root *,
+.dsh-root *::before,
+.dsh-root *::after {
     box-sizing: border-box;
 }
 
-.ad-root h1,
-.ad-root h2,
-.ad-root p,
-.ad-root ul {
+.dsh-root h1,
+.dsh-root h2,
+.dsh-root p,
+.dsh-root ul {
     margin: 0;
     padding: 0;
 }
 
-.ad-root ul {
+.dsh-root ul {
     list-style: none;
 }
 
-.ad-root button {
+.dsh-root button {
     font-family: inherit;
 }
 
-.ad-root a {
+.dsh-root a {
     color: inherit;
     text-decoration: none;
 }
 
-.ad-root :focus-visible {
+.dsh-root :focus-visible {
     outline: 3px solid rgba(232, 145, 42, 0.6);
     outline-offset: 2px;
 }
 
 /* ---------- Header ---------- */
 
-.ad-header {
+.dsh-header {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
@@ -87,7 +87,7 @@
     gap: 14px;
 }
 
-.ad-eyebrow {
+.dsh-eyebrow {
     font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -95,7 +95,7 @@
     color: var(--ad-muted);
 }
 
-.ad-title {
+.dsh-title {
     margin-top: 2px;
     font-size: 30px;
     line-height: 1.2;
@@ -104,18 +104,18 @@
     color: var(--ad-ink);
 }
 
-.ad-sub {
+.dsh-sub {
     margin-top: 6px;
     color: var(--ad-muted);
 }
 
-.ad-header-meta {
+.dsh-header-meta {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.ad-updated {
+.dsh-updated {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -124,7 +124,7 @@
     color: var(--ad-muted);
 }
 
-.ad-live-dot {
+.dsh-live-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -134,7 +134,7 @@
 
 /* ---------- Buttons ---------- */
 
-.ad-btn {
+.dsh-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -151,54 +151,54 @@
     transition: background 0.15s, border-color 0.15s, transform 0.08s;
 }
 
-.ad-btn:active:not(:disabled) {
+.dsh-btn:active:not(:disabled) {
     transform: scale(0.98);
 }
 
-.ad-btn:disabled {
+.dsh-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
 
-.ad-btn-sm {
+.dsh-btn-sm {
     min-height: 40px;
     padding: 0 14px;
 }
 
-.ad-btn-secondary {
+.dsh-btn-secondary {
     background: var(--ad-surface);
     color: var(--ad-ink);
     border-color: #d8dce3;
     box-shadow: var(--ad-shadow-sm);
 }
 
-.ad-btn-secondary:hover:not(:disabled) {
+.dsh-btn-secondary:hover:not(:disabled) {
     background: var(--ad-bg);
     border-color: var(--ad-accent);
 }
 
-.ad-btn-danger {
+.dsh-btn-danger {
     background: var(--ad-red);
     color: #fff;
 }
 
-.ad-btn-danger:hover:not(:disabled) {
+.dsh-btn-danger:hover:not(:disabled) {
     background: #a52f23;
 }
 
-@keyframes ad-spin {
+@keyframes dsh-spin {
     to {
         transform: rotate(360deg);
     }
 }
 
-.ad-spin {
-    animation: ad-spin 0.8s linear infinite;
+.dsh-spin {
+    animation: dsh-spin 0.8s linear infinite;
 }
 
 /* ---------- Notice + error ---------- */
 
-.ad-notice {
+.dsh-notice {
     display: flex;
     align-items: center;
     gap: 14px;
@@ -209,18 +209,18 @@
     color: var(--ad-accent-strong);
 }
 
-.ad-notice p {
+.dsh-notice p {
     flex: 1;
     min-width: 0;
     font-size: 14px;
     color: var(--ad-text);
 }
 
-.ad-notice strong {
+.dsh-notice strong {
     color: var(--ad-ink);
 }
 
-.ad-error {
+.dsh-error {
     display: flex;
     gap: 14px;
     padding: 22px;
@@ -229,34 +229,34 @@
     background: var(--ad-red-soft);
 }
 
-.ad-error-icon {
+.dsh-error-icon {
     flex-shrink: 0;
     margin-top: 4px;
     font-size: 20px;
     color: var(--ad-red);
 }
 
-.ad-error-title {
+.dsh-error-title {
     font-size: 17px;
     font-weight: 800;
     color: var(--ad-ink);
 }
 
-.ad-error-text {
+.dsh-error-text {
     margin: 2px 0 14px;
     font-size: 14px;
 }
 
 /* ---------- Needs attention ---------- */
 
-.ad-attention {
+.dsh-attention {
     border-radius: var(--ad-radius-lg);
     border: 1px solid var(--ad-accent-line);
     background: var(--ad-accent-soft);
     padding: 18px;
 }
 
-.ad-attention[data-state="clear"] {
+.dsh-attention[data-state="clear"] {
     display: flex;
     align-items: center;
     gap: 14px;
@@ -264,7 +264,7 @@
     background: var(--ad-green-soft);
 }
 
-.ad-attention-icon {
+.dsh-attention-icon {
     width: 44px;
     height: 44px;
     flex-shrink: 0;
@@ -276,20 +276,20 @@
     font-size: 20px;
 }
 
-.ad-attention-head {
+.dsh-attention-head {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 12px;
 }
 
-.ad-attention-title {
+.dsh-attention-title {
     font-size: 16px;
     font-weight: 800;
     color: var(--ad-ink);
 }
 
-.ad-attention-count {
+.dsh-attention-count {
     min-width: 24px;
     padding: 1px 8px;
     border-radius: 999px;
@@ -300,18 +300,18 @@
     text-align: center;
 }
 
-.ad-attention-text {
+.dsh-attention-text {
     font-size: 14px;
     color: var(--ad-text);
 }
 
-.ad-attention-list {
+.dsh-attention-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.ad-attention-item {
+.dsh-attention-item {
     display: flex;
     align-items: center;
     gap: 14px;
@@ -322,12 +322,12 @@
     transition: box-shadow 0.15s, transform 0.15s;
 }
 
-.ad-attention-item:hover {
+.dsh-attention-item:hover {
     box-shadow: var(--ad-shadow-md);
     transform: translateY(-1px);
 }
 
-.ad-attention-item-icon {
+.dsh-attention-item-icon {
     width: 42px;
     height: 42px;
     flex-shrink: 0;
@@ -339,24 +339,24 @@
     font-size: 17px;
 }
 
-.ad-attention-item-text {
+.dsh-attention-item-text {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
 }
 
-.ad-attention-item-text strong {
+.dsh-attention-item-text strong {
     font-weight: 800;
     color: var(--ad-ink);
 }
 
-.ad-attention-item-text span {
+.dsh-attention-item-text span {
     font-size: 13.5px;
     color: var(--ad-muted);
 }
 
-.ad-attention-cta {
+.dsh-attention-cta {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -368,13 +368,13 @@
 
 /* ---------- Key number cards ---------- */
 
-.ad-stats {
+.dsh-stats {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 14px;
 }
 
-.ad-stat {
+.dsh-stat {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -386,26 +386,26 @@
     transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
 }
 
-.ad-stat:hover {
+.dsh-stat:hover {
     box-shadow: var(--ad-shadow-md);
     transform: translateY(-2px);
     border-color: var(--ad-accent-line);
 }
 
-.ad-stat-top {
+.dsh-stat-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
 }
 
-.ad-stat-label {
+.dsh-stat-label {
     font-size: 13.5px;
     font-weight: 600;
     color: var(--ad-muted);
 }
 
-.ad-stat-icon {
+.dsh-stat-icon {
     width: 36px;
     height: 36px;
     display: grid;
@@ -416,7 +416,7 @@
     font-size: 14px;
 }
 
-.ad-stat-value {
+.dsh-stat-value {
     margin-top: 8px;
     font-size: 30px;
     font-weight: 800;
@@ -425,27 +425,27 @@
     color: var(--ad-ink);
 }
 
-.ad-stat-hint {
+.dsh-stat-hint {
     font-size: 13px;
     color: var(--ad-muted);
 }
 
 /* ---------- Main grid ---------- */
 
-.ad-grid {
+.dsh-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
     gap: 16px;
     align-items: start;
 }
 
-.ad-side {
+.dsh-side {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-.ad-panel {
+.dsh-panel {
     padding: 22px;
     background: var(--ad-surface);
     border: 1px solid var(--ad-line);
@@ -453,7 +453,7 @@
     box-shadow: var(--ad-shadow-sm);
 }
 
-.ad-panel-head {
+.dsh-panel-head {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -461,20 +461,20 @@
     margin-bottom: 18px;
 }
 
-.ad-panel-title {
+.dsh-panel-title {
     font-size: 18px;
     font-weight: 800;
     letter-spacing: -0.01em;
     color: var(--ad-ink);
 }
 
-.ad-panel-sub {
+.dsh-panel-sub {
     margin-top: 2px;
     font-size: 13.5px;
     color: var(--ad-muted);
 }
 
-.ad-link {
+.dsh-link {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -485,11 +485,11 @@
     color: var(--ad-accent-strong) !important;
 }
 
-.ad-link:hover {
+.dsh-link:hover {
     text-decoration: underline;
 }
 
-.ad-empty {
+.dsh-empty {
     padding: 28px 8px;
     text-align: center;
     color: var(--ad-muted);
@@ -497,7 +497,7 @@
 
 /* ---------- Request status ---------- */
 
-.ad-stack {
+.dsh-stack {
     display: flex;
     height: 12px;
     border-radius: 999px;
@@ -506,20 +506,20 @@
     gap: 2px;
 }
 
-.ad-stack-seg {
+.dsh-stack-seg {
     display: block;
     min-width: 4px;
     transition: width 0.4s ease;
 }
 
-.ad-rates {
+.dsh-rates {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     margin: 14px 0 6px;
 }
 
-.ad-rate {
+.dsh-rate {
     padding: 4px 12px;
     border: 1px solid var(--ad-line);
     border-radius: 999px;
@@ -528,31 +528,31 @@
     color: var(--ad-muted);
 }
 
-.ad-rate strong {
+.dsh-rate strong {
     color: var(--ad-ink);
 }
 
-.ad-rate[data-tone="good"] {
+.dsh-rate[data-tone="good"] {
     background: var(--ad-green-soft);
     border-color: var(--ad-green-line);
     color: var(--ad-green);
 }
 
-.ad-rate[data-tone="good"] strong {
+.dsh-rate[data-tone="good"] strong {
     color: var(--ad-green);
 }
 
-.ad-rate[data-tone="bad"] {
+.dsh-rate[data-tone="bad"] {
     background: var(--ad-red-soft);
     border-color: var(--ad-red-line);
     color: var(--ad-red);
 }
 
-.ad-rate[data-tone="bad"] strong {
+.dsh-rate[data-tone="bad"] strong {
     color: var(--ad-red);
 }
 
-.ad-status-row {
+.dsh-status-row {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -564,34 +564,34 @@
     transition: background 0.15s;
 }
 
-.ad-status-list li:last-child .ad-status-row {
+.dsh-status-list li:last-child .dsh-status-row {
     border-bottom-color: transparent;
 }
 
-.ad-status-row:hover {
+.dsh-status-row:hover {
     background: var(--ad-bg);
 }
 
-.ad-status-dot {
+.dsh-status-dot {
     width: 12px;
     height: 12px;
     flex-shrink: 0;
     border-radius: 50%;
 }
 
-.ad-status-label {
+.dsh-status-label {
     flex: 1;
     min-width: 0;
     font-weight: 600;
     color: var(--ad-text);
 }
 
-.ad-status-pct {
+.dsh-status-pct {
     font-size: 13px;
     color: var(--ad-muted);
 }
 
-.ad-status-value {
+.dsh-status-value {
     min-width: 44px;
     text-align: right;
     font-size: 16px;
@@ -599,21 +599,21 @@
     color: var(--ad-ink);
 }
 
-.ad-status-go {
+.dsh-status-go {
     font-size: 11px;
     color: #c4c9d2;
     transition: color 0.15s, transform 0.15s;
 }
 
-.ad-status-row:hover .ad-status-go {
+.dsh-status-row:hover .dsh-status-go {
     color: var(--ad-accent-strong);
     transform: translateX(2px);
 }
 
 /* ---------- Revenue (dark card) ---------- */
 
-/* Two class names so this beats the general ".ad-root a { color: inherit }" rule. */
-.ad-root .ad-revenue {
+/* Two class names so this beats the general ".dsh-root a { color: inherit }" rule. */
+.dsh-root .dsh-revenue {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -627,7 +627,7 @@
     transition: transform 0.18s;
 }
 
-.ad-revenue::after {
+.dsh-revenue::after {
     content: "";
     position: absolute;
     right: -50px;
@@ -639,33 +639,33 @@
     pointer-events: none;
 }
 
-.ad-revenue:hover {
+.dsh-revenue:hover {
     transform: translateY(-2px);
 }
 
-.ad-revenue > * {
+.dsh-revenue > * {
     position: relative;
     z-index: 1;
 }
 
-.ad-revenue :focus-visible,
-.ad-revenue:focus-visible {
+.dsh-revenue :focus-visible,
+.dsh-revenue:focus-visible {
     outline-color: #fff;
 }
 
-.ad-revenue-top {
+.dsh-revenue-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.ad-revenue-label {
+.dsh-revenue-label {
     font-size: 13.5px;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.75);
 }
 
-.ad-revenue-icon {
+.dsh-revenue-icon {
     width: 38px;
     height: 38px;
     display: grid;
@@ -676,7 +676,7 @@
     font-size: 15px;
 }
 
-.ad-revenue-value {
+.dsh-revenue-value {
     color: #fff;
     margin-top: 6px;
     font-size: 32px;
@@ -686,12 +686,12 @@
     overflow-wrap: anywhere;
 }
 
-.ad-revenue-note {
+.dsh-revenue-note {
     font-size: 13px;
     color: rgba(255, 255, 255, 0.7);
 }
 
-.ad-revenue-foot {
+.dsh-revenue-foot {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
@@ -701,19 +701,19 @@
     border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
-.ad-revenue-foot-label {
+.dsh-revenue-foot-label {
     display: block;
     font-size: 12.5px;
     color: rgba(255, 255, 255, 0.7);
 }
 
-.ad-revenue-foot strong {
+.dsh-revenue-foot strong {
     color: #fff;
     font-size: 18px;
     font-weight: 800;
 }
 
-.ad-revenue-cta {
+.dsh-revenue-cta {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -724,7 +724,7 @@
 
 /* ---------- Complaints ---------- */
 
-.ad-complaints {
+.dsh-complaints {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -736,25 +736,25 @@
     transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
 }
 
-.ad-complaints:hover {
+.dsh-complaints:hover {
     box-shadow: var(--ad-shadow-md);
     transform: translateY(-2px);
     border-color: var(--ad-accent-line);
 }
 
-.ad-complaints-top {
+.dsh-complaints-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.ad-complaints-label {
+.dsh-complaints-label {
     font-size: 13.5px;
     font-weight: 600;
     color: var(--ad-muted);
 }
 
-.ad-complaints-icon {
+.dsh-complaints-icon {
     width: 38px;
     height: 38px;
     display: grid;
@@ -765,7 +765,7 @@
     font-size: 15px;
 }
 
-.ad-complaints-value {
+.dsh-complaints-value {
     margin-top: 6px;
     font-size: 30px;
     font-weight: 800;
@@ -774,12 +774,12 @@
     color: var(--ad-ink);
 }
 
-.ad-complaints-note {
+.dsh-complaints-note {
     font-size: 13px;
     color: var(--ad-muted);
 }
 
-.ad-complaints-cta {
+.dsh-complaints-cta {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -791,84 +791,84 @@
 
 /* ---------- Skeleton ---------- */
 
-@keyframes ad-shimmer {
+@keyframes dsh-shimmer {
     to {
         background-position: -200% 0;
     }
 }
 
-.ad-skeleton {
+.dsh-skeleton {
     border-radius: var(--ad-radius-md);
     background: linear-gradient(90deg, #eceef2 25%, #f7f8fa 50%, #eceef2 75%);
     background-size: 200% 100%;
-    animation: ad-shimmer 1.4s linear infinite;
+    animation: dsh-shimmer 1.4s linear infinite;
 }
 
 /* ---------- Responsive ---------- */
 
 @media (max-width: 1100px) {
-    .ad-grid {
+    .dsh-grid {
         grid-template-columns: minmax(0, 1fr);
     }
 
-    .ad-stats {
+    .dsh-stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 640px) {
-    .ad-root {
+    .dsh-root {
         gap: 16px;
     }
 
-    .ad-title {
+    .dsh-title {
         font-size: 24px;
     }
 
-    .ad-header-meta {
+    .dsh-header-meta {
         width: 100%;
         justify-content: space-between;
     }
 
-    .ad-attention,
-    .ad-panel,
-    .ad-revenue,
-    .ad-complaints {
+    .dsh-attention,
+    .dsh-panel,
+    .dsh-revenue,
+    .dsh-complaints {
         padding: 16px;
     }
 
-    .ad-stat {
+    .dsh-stat {
         padding: 14px;
     }
 
-    .ad-stat-value {
+    .dsh-stat-value {
         font-size: 26px;
     }
 
-    .ad-attention-item {
+    .dsh-attention-item {
         flex-wrap: wrap;
     }
 
-    .ad-attention-cta {
+    .dsh-attention-cta {
         width: 100%;
         justify-content: flex-end;
     }
 
-    .ad-status-go {
+    .dsh-status-go {
         display: none;
     }
 }
 
 @media (max-width: 380px) {
-    .ad-stats {
+    .dsh-stats {
         grid-template-columns: minmax(0, 1fr);
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .ad-root *,
-    .ad-root *::before,
-    .ad-root *::after {
+    .dsh-root *,
+    .dsh-root *::before,
+    .dsh-root *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
