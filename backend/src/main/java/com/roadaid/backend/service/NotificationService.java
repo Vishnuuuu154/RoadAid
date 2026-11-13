@@ -4,8 +4,8 @@ package com.roadaid.backend.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -19,17 +19,21 @@ import com.roadaid.backend.repository.UserRepository;
 @Service
 public class NotificationService {
 
+    private static final Logger log =
+            LoggerFactory.getLogger(NotificationService.class);
+
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
-    private final JavaMailSender mailSender;
+    private final ResendEmailService resendEmailService;
 
     public NotificationService(
             NotificationRepository notificationRepository,
             UserRepository userRepository,
-            JavaMailSender mailSender) {
+            ResendEmailService resendEmailService) {
+
         this.notificationRepository = notificationRepository;
         this.userRepository = userRepository;
-        this.mailSender = mailSender;
+        this.resendEmailService = resendEmailService;
     }
 
     private User getCurrentUser() {
@@ -39,7 +43,8 @@ public class NotificationService {
         String email = authentication.getName();
 
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
     }
 
     public Notification createNotification(String message) {
@@ -55,6 +60,7 @@ public class NotificationService {
     }
 
     public Notification notifyUser(User user, String message) {
+
         Notification notification = new Notification();
         notification.setUser(user);
         notification.setMessage(message);
@@ -64,70 +70,82 @@ public class NotificationService {
         Notification savedNotification =
                 notificationRepository.save(notification);
 
-        sendEmail(user.getEmail(), "RoadAid Account Update", message);
+        try {
+            if (user.getEmail() != null
+                    && !user.getEmail().isBlank()) {
+
+                resendEmailService.sendEmail(
+                        user.getEmail(),
+                        "RoadAid Account Update",
+                        "Hello,\n\n" + message
+                                + "\n\nRegards,\nRoadAid Team"
+                );
+            }
+
+        } catch (Exception e) {
+            log.warn(
+                    "Email notification failed. In-app notification was saved. Reason: {}",
+                    e.getMessage()
+            );
+        }
 
         return savedNotification;
     }
 
-    private void sendEmail(String recipient, String subject, String message) {
-        if (recipient == null || recipient.isBlank()) {
-            throw new RuntimeException("Recipient email is missing");
-        }
-
-        SimpleMailMessage email = new SimpleMailMessage();
-        email.setTo(recipient);
-        email.setSubject(subject);
-        email.setText(
-                "Hello,\n\n"
-                        + message
-                        + "\n\nRegards,\nRoadAid Team"
-        );
-
-        mailSender.send(email);
-    }
-
     public List<Notification> getMyNotifications() {
         User user = getCurrentUser();
-        return notificationRepository.findByUserOrderByCreatedAtDesc(user);
+
+        return notificationRepository
+                .findByUserOrderByCreatedAtDesc(user);
     }
 
     public Notification markAsRead(Long id) {
+
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
 
         Notification notification =
                 notificationRepository.findByIdAndUser(id, user)
                         .orElseThrow(() ->
-                                new RuntimeException("Notification not found"));
+                                new RuntimeException(
+                                        "Notification not found"
+                                ));
 
         notification.setRead(true);
+
         return notificationRepository.save(notification);
     }
 
     @Transactional
     public int markAllAsRead() {
         User user = getCurrentUser();
+
         return notificationRepository.markAllAsRead(user);
     }
 
     public void deleteNotification(Long id) {
+
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
 
         Notification notification =
                 notificationRepository.findByIdAndUser(id, user)
                         .orElseThrow(() ->
-                                new RuntimeException("Notification not found"));
+                                new RuntimeException(
+                                        "Notification not found"
+                                ));
 
         notificationRepository.delete(notification);
     }
