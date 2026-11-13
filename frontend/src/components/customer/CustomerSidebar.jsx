@@ -164,6 +164,17 @@ function getFocusable(root) {
 }
 
 /* ------------------------------------------------------------------ */
+/*  MaybePortal                                                        */
+/*  On mobile the drawer is rendered directly under <body>, so no     */
+/*  transform/filter on a parent in the layout can break              */
+/*  position:fixed (which made the drawer taller than the screen).    */
+/*  On desktop it stays in the layout as before.                      */
+/* ------------------------------------------------------------------ */
+function MaybePortal({ active, children }) {
+    return active ? createPortal(<>{children}</>, document.body) : <>{children}</>;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Logout confirmation                                                */
 /*  Rendered in a portal because the mobile drawer uses a transform,  */
 /*  which would otherwise trap position:fixed inside the drawer.      */
@@ -358,202 +369,204 @@ function CustomerSidebar({
         <>
             <style>{STYLES}</style>
 
-            <div
-                className={`cust-backdrop${mobileOpen ? " is-open" : ""}`}
-                onClick={closeMobile}
-                aria-hidden="true"
-            />
+            <MaybePortal active={isMobile}>
+                <div
+                    className={`cust-backdrop${mobileOpen ? " is-open" : ""}`}
+                    onClick={closeMobile}
+                    aria-hidden="true"
+                />
 
-            <aside
-                ref={panelRef}
-                id="cust-sidebar"
-                className={`cust-sidebar${collapsed ? " is-collapsed" : ""}${mobileOpen ? " is-open" : ""}`}
-            >
-                {/* Header */}
-                <div className="cust-header">
-                    <Link to="/customer" className="cust-brand" aria-label="RoadAid customer home">
-                        <span className="cust-logo">
-                            <RoadAidMark size={22} />
-                        </span>
-                        {!collapsed && (
-                            <span className="cust-brand-text">
-                                <span className="cust-brand-name">RoadAid</span>
-                                <span className="cust-brand-sub">Customer</span>
+                <aside
+                    ref={panelRef}
+                    id="cust-sidebar"
+                    className={`cust-sidebar${collapsed ? " is-collapsed" : ""}${mobileOpen ? " is-open" : ""}`}
+                >
+                    {/* Header */}
+                    <div className="cust-header">
+                        <Link to="/customer" className="cust-brand" aria-label="RoadAid customer home">
+                            <span className="cust-logo">
+                                <RoadAidMark size={22} />
                             </span>
-                        )}
-                    </Link>
-
-                    <button
-                        ref={closeBtnRef}
-                        type="button"
-                        className="cust-close"
-                        onClick={closeMobile}
-                        aria-label="Close menu"
-                    >
-                        <FaTimes size={17} aria-hidden="true" />
-                    </button>
-                </div>
-
-                {/* Primary action + live status */}
-                <div className="cust-top">
-                    <Link
-                        to={REQUEST_HELP_PATH}
-                        className="cust-cta"
-                        aria-label={collapsed ? "Request help" : undefined}
-                        title={collapsed ? "Request help" : undefined}
-                        onClick={(e) => {
-                            if (onRequestHelp) {
-                                e.preventDefault();
-                                onRequestHelp();
-                                closeMobile();
-                            }
-                        }}
-                    >
-                        <FaPlus size={14} aria-hidden="true" />
-                        {!collapsed && <span>Request help</span>}
-                    </Link>
-
-                    {activeRequest && (
-                        <Link
-                            to={LIVE_MAP_PATH}
-                            className="cust-live"
-                            aria-label={`${activeRequest.title || "Help is on the way"}. ${
-                                activeRequest.subtitle || "Track on live map"
-                            }`}
-                            title={collapsed ? activeRequest.title || "Help is on the way" : undefined}
-                        >
-                            <span className="cust-live-dot" aria-hidden="true" />
                             {!collapsed && (
-                                <>
-                                    <span className="cust-live-text">
-                                        <span className="cust-live-title">
-                                            {activeRequest.title || "Help is on the way"}
-                                        </span>
-                                        <span className="cust-live-sub">
-                                            {activeRequest.subtitle || "Track on live map"}
-                                        </span>
-                                    </span>
-                                    <FaChevronRight size={11} aria-hidden="true" />
-                                </>
+                                <span className="cust-brand-text">
+                                    <span className="cust-brand-name">RoadAid</span>
+                                    <span className="cust-brand-sub">Customer</span>
+                                </span>
                             )}
                         </Link>
-                    )}
-                </div>
 
-                {/* Navigation */}
-                <nav className="cust-nav" aria-label="Customer menu">
-                    {NAV_GROUPS.map((group) => (
-                        <div className="cust-group" key={group.id}>
-                            {group.label &&
-                                (collapsed ? (
-                                    <div className="cust-group-divider" />
-                                ) : (
-                                    <p className="cust-group-label">{group.label}</p>
-                                ))}
+                        <button
+                            ref={closeBtnRef}
+                            type="button"
+                            className="cust-close"
+                            onClick={closeMobile}
+                            aria-label="Close menu"
+                        >
+                            <FaTimes size={17} aria-hidden="true" />
+                        </button>
+                    </div>
 
-                            <ul className="cust-list" role="list">
-                                {group.items.map((item) => {
-                                    const count = item.id === "notifications" ? unread : 0;
-                                    const countLabel = count > 99 ? "99+" : String(count);
-                                    const fullLabel = count
-                                        ? `${item.label}, ${count} unread`
-                                        : item.label;
+                    {/* Primary action + live status */}
+                    <div className="cust-top">
+                        <Link
+                            to={REQUEST_HELP_PATH}
+                            className="cust-cta"
+                            aria-label={collapsed ? "Request help" : undefined}
+                            title={collapsed ? "Request help" : undefined}
+                            onClick={(e) => {
+                                if (onRequestHelp) {
+                                    e.preventDefault();
+                                    onRequestHelp();
+                                    closeMobile();
+                                }
+                            }}
+                        >
+                            <FaPlus size={14} aria-hidden="true" />
+                            {!collapsed && <span>Request help</span>}
+                        </Link>
 
-                                    return (
-                                        <li key={item.id}>
-                                            <NavLink
-                                                to={item.to}
-                                                end={item.end}
-                                                className={({ isActive }) =>
-                                                    `cust-nav-link${isActive ? " active" : ""}`
-                                                }
-                                                aria-label={collapsed ? fullLabel : undefined}
-                                                title={collapsed ? fullLabel : undefined}
-                                            >
-                                                <span className="cust-nav-icon">
-                                                    <item.icon size={18} aria-hidden="true" focusable="false" />
-                                                    {collapsed && count > 0 && <span className="cust-dot" />}
-                                                </span>
-                                                {!collapsed && (
-                                                    <>
-                                                        <span className="cust-nav-label">{item.label}</span>
-                                                        {count > 0 && (
-                                                            <>
-                                                                <span className="cust-badge" aria-hidden="true">
-                                                                    {countLabel}
-                                                                </span>
-                                                                <span className="cust-sr">{count} unread</span>
-                                                            </>
-                                                        )}
-                                                    </>
-                                                )}
-                                            </NavLink>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </div>
-                    ))}
-                </nav>
-
-                {/* Collapse toggle (desktop only) */}
-                <button
-                    type="button"
-                    className="cust-collapse"
-                    onClick={() => setCollapsedPref((v) => !v)}
-                    aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-                    aria-expanded={!collapsed}
-                    aria-controls="cust-sidebar"
-                    title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-                >
-                    {collapsed ? (
-                        <FaChevronRight size={11} aria-hidden="true" />
-                    ) : (
-                        <FaChevronLeft size={11} aria-hidden="true" />
-                    )}
-                </button>
-
-                {/* Account + logout */}
-                <div className="cust-footer">
-                    <NavLink
-                        to={PROFILE_PATH}
-                        className={({ isActive }) => `cust-account${isActive ? " active" : ""}`}
-                        aria-label={collapsed ? `${userName || "My profile"}, view profile` : undefined}
-                        title={collapsed ? userName || "My profile" : undefined}
-                    >
-                        <span className="cust-avatar" aria-hidden="true">
-                            {user?.avatarUrl ? (
-                                <img src={user.avatarUrl} alt="" />
-                            ) : initials ? (
-                                initials
-                            ) : (
-                                <FaUserCircle size={22} />
-                            )}
-                        </span>
-                        {!collapsed && (
-                            <span className="cust-account-text">
-                                <span className="cust-account-name">{userName || "My profile"}</span>
-                                <span className="cust-account-sub">
-                                    {userName ? "View profile" : "Account and settings"}
-                                </span>
-                            </span>
+                        {activeRequest && (
+                            <Link
+                                to={LIVE_MAP_PATH}
+                                className="cust-live"
+                                aria-label={`${activeRequest.title || "Help is on the way"}. ${
+                                    activeRequest.subtitle || "Track on live map"
+                                }`}
+                                title={collapsed ? activeRequest.title || "Help is on the way" : undefined}
+                            >
+                                <span className="cust-live-dot" aria-hidden="true" />
+                                {!collapsed && (
+                                    <>
+                                        <span className="cust-live-text">
+                                            <span className="cust-live-title">
+                                                {activeRequest.title || "Help is on the way"}
+                                            </span>
+                                            <span className="cust-live-sub">
+                                                {activeRequest.subtitle || "Track on live map"}
+                                            </span>
+                                        </span>
+                                        <FaChevronRight size={11} aria-hidden="true" />
+                                    </>
+                                )}
+                            </Link>
                         )}
-                    </NavLink>
+                    </div>
 
+                    {/* Navigation */}
+                    <nav className="cust-nav" aria-label="Customer menu">
+                        {NAV_GROUPS.map((group) => (
+                            <div className="cust-group" key={group.id}>
+                                {group.label &&
+                                    (collapsed ? (
+                                        <div className="cust-group-divider" />
+                                    ) : (
+                                        <p className="cust-group-label">{group.label}</p>
+                                    ))}
+
+                                <ul className="cust-list" role="list">
+                                    {group.items.map((item) => {
+                                        const count = item.id === "notifications" ? unread : 0;
+                                        const countLabel = count > 99 ? "99+" : String(count);
+                                        const fullLabel = count
+                                            ? `${item.label}, ${count} unread`
+                                            : item.label;
+
+                                        return (
+                                            <li key={item.id}>
+                                                <NavLink
+                                                    to={item.to}
+                                                    end={item.end}
+                                                    className={({ isActive }) =>
+                                                        `cust-nav-link${isActive ? " active" : ""}`
+                                                    }
+                                                    aria-label={collapsed ? fullLabel : undefined}
+                                                    title={collapsed ? fullLabel : undefined}
+                                                >
+                                                    <span className="cust-nav-icon">
+                                                        <item.icon size={18} aria-hidden="true" focusable="false" />
+                                                        {collapsed && count > 0 && <span className="cust-dot" />}
+                                                    </span>
+                                                    {!collapsed && (
+                                                        <>
+                                                            <span className="cust-nav-label">{item.label}</span>
+                                                            {count > 0 && (
+                                                                <>
+                                                                    <span className="cust-badge" aria-hidden="true">
+                                                                        {countLabel}
+                                                                    </span>
+                                                                    <span className="cust-sr">{count} unread</span>
+                                                                </>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                </NavLink>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+                        ))}
+                    </nav>
+
+                    {/* Collapse toggle (desktop only) */}
                     <button
                         type="button"
-                        className="cust-logout"
-                        onClick={() => setConfirmingLogout(true)}
-                        aria-label={collapsed ? "Log out" : undefined}
-                        title={collapsed ? "Log out" : undefined}
+                        className="cust-collapse"
+                        onClick={() => setCollapsedPref((v) => !v)}
+                        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                        aria-expanded={!collapsed}
+                        aria-controls="cust-sidebar"
+                        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
                     >
-                        <span className="cust-nav-icon" style={{ color: "inherit" }}>
-                            <FaSignOutAlt size={17} aria-hidden="true" />
-                        </span>
-                        {!collapsed && <span>Log out</span>}
+                        {collapsed ? (
+                            <FaChevronRight size={11} aria-hidden="true" />
+                        ) : (
+                            <FaChevronLeft size={11} aria-hidden="true" />
+                        )}
                     </button>
-                </div>
-            </aside>
+
+                    {/* Account + logout */}
+                    <div className="cust-footer">
+                        <NavLink
+                            to={PROFILE_PATH}
+                            className={({ isActive }) => `cust-account${isActive ? " active" : ""}`}
+                            aria-label={collapsed ? `${userName || "My profile"}, view profile` : undefined}
+                            title={collapsed ? userName || "My profile" : undefined}
+                        >
+                            <span className="cust-avatar" aria-hidden="true">
+                                {user?.avatarUrl ? (
+                                    <img src={user.avatarUrl} alt="" />
+                                ) : initials ? (
+                                    initials
+                                ) : (
+                                    <FaUserCircle size={22} />
+                                )}
+                            </span>
+                            {!collapsed && (
+                                <span className="cust-account-text">
+                                    <span className="cust-account-name">{userName || "My profile"}</span>
+                                    <span className="cust-account-sub">
+                                        {userName ? "View profile" : "Account and settings"}
+                                    </span>
+                                </span>
+                            )}
+                        </NavLink>
+
+                        <button
+                            type="button"
+                            className="cust-logout"
+                            onClick={() => setConfirmingLogout(true)}
+                            aria-label={collapsed ? "Log out" : undefined}
+                            title={collapsed ? "Log out" : undefined}
+                        >
+                            <span className="cust-nav-icon" style={{ color: "inherit" }}>
+                                <FaSignOutAlt size={17} aria-hidden="true" />
+                            </span>
+                            {!collapsed && <span>Log out</span>}
+                        </button>
+                    </div>
+                </aside>
+            </MaybePortal>
 
             {confirmingLogout && (
                 <LogoutDialog onCancel={() => setConfirmingLogout(false)} onConfirm={confirmLogout} />
@@ -813,6 +826,7 @@ const STYLES = `
 @media (max-width: 900px) {
     .cust-sidebar {
         position: fixed; left: 0; top: 0; bottom: 0; height: auto;
+        max-height: 100vh; max-height: 100dvh;
         width: min(300px, 86vw); z-index: 1000;
         transform: translateX(-102%); visibility: hidden;
         transition: transform 0.22s ease, visibility 0s linear 0.22s;
