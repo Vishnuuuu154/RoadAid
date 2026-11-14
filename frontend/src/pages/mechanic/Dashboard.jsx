@@ -46,9 +46,9 @@ const POLL_MS = 30000;
  * Every link on this page lives here. If your router uses different paths,
  * change them in this one place.
  *
- * The four stat cards open the requests page with a ?status= filter.
- * Your requests page should read that query value (PENDING, IN_PROGRESS,
- * COMPLETED, or nothing for "all").
+ * The stat cards open the requests page with a ?status= filter.
+ * Your requests page should read that query value (PENDING, COMPLETED,
+ * or nothing for "all").
  */
 const ROUTES = {
     requests: "/mechanic/requests",
@@ -60,11 +60,22 @@ const ROUTES = {
 const STATUS_CONFIG = {
     PENDING: { label: "Pending", icon: FaHourglassHalf, tone: "warning" },
     WAITING_FOR_QUOTATION: { label: "Quotation needed", icon: FaMoneyBillWave, tone: "info" },
+    QUOTATION_PENDING: { label: "Quote sent", icon: FaMoneyBillWave, tone: "info" },
+    ACCEPTED: { label: "Accepted", icon: FaCheckCircle, tone: "primary" },
     IN_PROGRESS: { label: "In progress", icon: FaTools, tone: "primary" },
     COMPLETED: { label: "Completed", icon: FaCheckCircle, tone: "success" },
     REJECTED: { label: "Rejected", icon: FaTimesCircle, tone: "danger" },
     CANCELLED: { label: "Cancelled", icon: FaBan, tone: "neutral" }
 };
+
+/*
+ * Which statuses belong in which tab.
+ *  - Quotes: the mechanic accepted and must send a quote, or already sent one
+ *    and is waiting for the customer.
+ *  - Active: the customer accepted the quote (or the job has started).
+ */
+const QUOTATION_STATUSES = ["WAITING_FOR_QUOTATION", "QUOTATION_PENDING"];
+const ACTIVE_STATUSES = ["ACCEPTED", "IN_PROGRESS"];
 
 const SERVICE_STAGES = [
     { key: "ON_THE_WAY", label: "On the way", icon: FaRoute },
@@ -80,8 +91,8 @@ const TABS = [
 
 const EMPTY_CONFIG = {
     incoming: { icon: FaInbox, title: "No new requests", description: "New requests show up here the moment customers reach out." },
-    active: { icon: FaBoxOpen, title: "No active jobs", description: "Jobs you've accepted and are working on appear here." },
-    quotation: { icon: FaMoneyBillWave, title: "No quotes to send", description: "Requests that need a price quote first will appear here." }
+    active: { icon: FaBoxOpen, title: "No active jobs", description: "Jobs the customer has accepted, and jobs you've started, appear here." },
+    quotation: { icon: FaMoneyBillWave, title: "No quotes to send", description: "Requests that need a price quote, or are waiting for the customer to answer one, appear here." }
 };
 
 const PAYMENT_STATUS = {
@@ -390,7 +401,8 @@ function RequestCard({ request, variant, busy, now, onAccept, onReject, onView, 
                 )}
                 {variant === "quotation" && (
                     <button type="button" className="db-btn db-btn-primary" onClick={() => onView(request.requestId)}>
-                        <FaMoneyBillWave aria-hidden="true" /> Send quotation
+                        <FaMoneyBillWave aria-hidden="true" />{" "}
+                        {request.status === "QUOTATION_PENDING" ? "View quotation" : "Send quotation"}
                     </button>
                 )}
                 {variant === "active" && (
@@ -749,8 +761,8 @@ function DashboardContent() {
                 if (!pickedTab.current) {
                     pickedTab.current = true;
                     if (pending === 0) {
-                        if (rows.some((x) => x.status === "IN_PROGRESS")) setActiveTab("active");
-                        else if (rows.some((x) => x.status === "WAITING_FOR_QUOTATION")) setActiveTab("quotation");
+                        if (rows.some((x) => ACTIVE_STATUSES.includes(x.status))) setActiveTab("active");
+                        else if (rows.some((x) => QUOTATION_STATUSES.includes(x.status))) setActiveTab("quotation");
                     }
                 }
             }
@@ -797,8 +809,8 @@ function DashboardContent() {
     const groupsRaw = useMemo(
         () => ({
             incoming: requests.filter((r) => r.status === "PENDING"),
-            active: requests.filter((r) => r.status === "IN_PROGRESS"),
-            quotation: requests.filter((r) => r.status === "WAITING_FOR_QUOTATION")
+            active: requests.filter((r) => ACTIVE_STATUSES.includes(r.status)),
+            quotation: requests.filter((r) => QUOTATION_STATUSES.includes(r.status))
         }),
         [requests]
     );
@@ -845,8 +857,9 @@ function DashboardContent() {
         try {
             await acceptRequest(id);
             await load(true);
-            showToast(`Request #${id} accepted.`, "success");
-            setActiveTab("active");
+            showToast(`Request #${id} accepted. Send your quotation next.`, "success");
+            // After accepting, the request waits for your quotation.
+            setActiveTab("quotation");
         } catch (error) {
             showToast(error.response?.data?.message || "Failed to accept request.", "error");
         } finally {
@@ -991,11 +1004,11 @@ function DashboardContent() {
                 />
                 <StatCard
                     icon={FaTools}
-                    label="In progress"
+                    label="Active jobs"
                     value={groupsRaw.active.length}
-                    hint="View jobs in progress"
+                    hint="View active jobs"
                     tone="primary"
-                    to={`${ROUTES.requests}?status=IN_PROGRESS`}
+                    to={ROUTES.requests}
                 />
                 <StatCard
                     icon={FaCheckCircle}
